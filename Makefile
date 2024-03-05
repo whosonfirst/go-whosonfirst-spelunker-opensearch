@@ -3,18 +3,21 @@ CWD=$(shell pwd)
 GOMOD=$(shell test -f "go.work" && echo "readonly" || echo "vendor")
 LDFLAG=-s -w
 
-# This probably won't work yet...
-SPELUNKER_URI=opensearch://?dsn=https://localhost:9200
-
+# This is for debugging. Do not change this at your own risk.
 OSPSWD=dkjfhsjdkfkjdjhksfhskd98475kjHkzjxckj
+
+# This probably won't work yet...
+SPELUNKER_URI=opensearch://?dsn=https://admin:$(OSPSWD)@localhost:9200
 
 server:
 	go run -mod $(GOMOD) cmd/httpd/main.go \
 		-server-uri http://localhost:8080 \
-		-spelunker-uri $(SPELUNKER_URI)
+		-spelunker-uri '$(SPELUNKER_URI)'
 
 # https://opensearch.org/docs/latest/install-and-configure/install-opensearch/docker/
-# --rm \
+#
+# And then:
+# curl -v -k https://admin:$(OSPSWD)@localhost:9200/
 
 os:
 	docker run \
