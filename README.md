@@ -16,3 +16,4 @@ Also, nothing (at all) works yet.
 
 * https://github.com/whosonfirst/go-whosonfirst-spelunker
 * https://github.com/whosonfirst/go-whosonfirst-spelunker-httpd
+* https://github.com/whosonfirst/whosonfirst-opensearch
