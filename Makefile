@@ -4,6 +4,7 @@ GOMOD=$(shell test -f "go.work" && echo "readonly" || echo "vendor")
 LDFLAG=-s -w
 
 # This is for debugging. Do not change this at your own risk.
+# (That means you should change this.)
 OSPSWD=dkjfhsjdkfkjdjhksfhskd98475kjHkzjxckj
 
 # This probably won't work yet...
