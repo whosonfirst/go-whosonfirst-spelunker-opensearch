@@ -10,8 +10,6 @@ Documentation is incompete at this time. For starters consult the (also incomple
 
 This is work in progress and you should expect things to change, break or simply not work yet.
 
-Also, nothing (at all) works yet.
-
 ## Examples
 
 ### Indexing
