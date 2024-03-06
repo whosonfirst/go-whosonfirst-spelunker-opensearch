@@ -4,13 +4,15 @@ import (
 	"context"
 	"fmt"
 	"io"
-	_ "log/slog"
+	"log/slog"
 	"net/url"
 	"strings"
 	"time"
 
 	"github.com/aaronland/go-pagination"
+	"github.com/aaronland/go-pagination/countable"
 	opensearch "github.com/opensearch-project/opensearch-go/v2"
+	opensearchapi "github.com/opensearch-project/opensearch-go/v2/opensearchapi"
 	"github.com/tidwall/gjson"
 	"github.com/whosonfirst/go-whosonfirst-opensearch/client"
 	"github.com/whosonfirst/go-whosonfirst-placetypes"
@@ -22,6 +24,7 @@ import (
 type OpenSearchSpelunker struct {
 	spelunker.Spelunker
 	client *opensearch.Client
+	index  string
 }
 
 func init() {
@@ -53,6 +56,7 @@ func NewOpenSearchSpelunker(ctx context.Context, uri string) (spelunker.Spelunke
 
 	s := &OpenSearchSpelunker{
 		client: cl,
+		index:  "spelunker",
 	}
 
 	return s, nil
@@ -62,41 +66,15 @@ func (s *OpenSearchSpelunker) GetById(ctx context.Context, id int64) ([]byte, er
 
 	q := fmt.Sprintf(`{"query": { "ids": { "values": [ %d ] } } }`, id)
 
-	// v2/opensearchapi
-
-	rsp, err := s.client.Search(
-		s.client.Search.WithIndex("spelunker"),
-		s.client.Search.WithBody(strings.NewReader(q)),
-	)
-
-	if err != nil {
-		return nil, fmt.Errorf("Failed to execute search, %w", err)
+	req := &opensearchapi.SearchRequest{
+		Body: strings.NewReader(q),
 	}
 
-	// v3/opensearchapi
-
-	/*
-		req := &opensearchapi.SearchRequest{
-		        Body: strings.NewReader(q),
-		}
-
-		rsp, err := s.client.Search(ctx, req)
-
-		if err != nil {
-			return nil, fmt.Errorf("Failed to execute search, %w", err)
-		}
-	*/
-
-	defer rsp.Body.Close()
-
-	if rsp.StatusCode != 200 {
-		return nil, fmt.Errorf("Invalid status")
-	}
-
-	body, err := io.ReadAll(rsp.Body)
+	body, err := s.search(ctx, req)
 
 	if err != nil {
-		return nil, fmt.Errorf("Failed to read response, %w", err)
+		slog.Error("Get by ID query failed", "q", q)
+		return nil, fmt.Errorf("Failed to retrieve %d, %w", id, err)
 	}
 
 	r := gjson.GetBytes(body, "hits.hits.0._source")
@@ -105,9 +83,7 @@ func (s *OpenSearchSpelunker) GetById(ctx context.Context, id int64) ([]byte, er
 		return nil, fmt.Errorf("First hit missing")
 	}
 
-	// Need to turn this in to GeoJSON...
-
-	return []byte(r.String()), nil
+	return s.propsToGeoJSON(r.String()), nil
 }
 
 func (s *OpenSearchSpelunker) GetAlternateGeometryById(ctx context.Context, id int64, alt_geom *uri.AltGeom) ([]byte, error) {
@@ -117,7 +93,66 @@ func (s *OpenSearchSpelunker) GetAlternateGeometryById(ctx context.Context, id i
 
 func (s *OpenSearchSpelunker) GetDescendants(ctx context.Context, pg_opts pagination.Options, id int64, filters []spelunker.Filter) (wof_spr.StandardPlacesResults, pagination.Results, error) {
 
-	return nil, nil, spelunker.ErrNotImplemented
+	q := s.descendantsQuery(id)
+	sz := int(pg_opts.PerPage())
+
+	req := &opensearchapi.SearchRequest{
+		Body: strings.NewReader(q),
+		Size: &sz,
+		// pagination offset, scroll wah-wah here...
+	}
+
+	body, err := s.search(ctx, req)
+
+	if err != nil {
+		slog.Error("Count descendants query failed", "q", q)
+		return nil, nil, fmt.Errorf("Failed to retrieve %d, %w", id, err)
+	}
+
+	// START OF put me in a function
+
+	r := gjson.GetBytes(body, "hits.total.value")
+	count := r.Int()
+
+	var pg_results pagination.Results
+	var pg_err error
+
+	if pg_opts != nil {
+		pg_results, pg_err = countable.NewResultsFromCountWithOptions(pg_opts, count)
+	} else {
+		pg_results, pg_err = countable.NewResultsFromCount(count)
+	}
+
+	if pg_err != nil {
+		return nil, nil, pg_err
+	}
+
+	// START OF put me in a(nother) function
+
+	hits_r := gjson.GetBytes(body, "hits.hits")
+	count_hits := len(hits_r.Array())
+
+	results := make([]wof_spr.StandardPlacesResult, count_hits)
+
+	for idx, r := range hits_r.Array() {
+
+		src := r.Get("_source")
+		sp_spr, err := NewSpelunkerRecordSPR([]byte(src.String()))
+
+		if err != nil {
+			slog.Error("Failed to derive SPR from result", "q", q, "index", idx, "error", err)
+			return nil, nil, fmt.Errorf("Failed to derive SPR from result, %w", err)
+		}
+
+		results[idx] = sp_spr
+	}
+
+	spr_results := NewSpelunkerStandardPlacesResults(results)
+
+	// END OF put me in a(nother) function
+	// END OF put me in a function
+
+	return spr_results, pg_results, nil
 }
 
 func (s *OpenSearchSpelunker) GetDescendantsFaceted(ctx context.Context, id int64, filters []spelunker.Filter, facets []*spelunker.Facet) ([]*spelunker.Faceting, error) {
@@ -127,7 +162,23 @@ func (s *OpenSearchSpelunker) GetDescendantsFaceted(ctx context.Context, id int6
 
 func (s *OpenSearchSpelunker) CountDescendants(ctx context.Context, id int64) (int64, error) {
 
-	return 0, nil // spelunker.ErrNotImplemented
+	q := s.descendantsQuery(id)
+	sz := 1
+
+	req := &opensearchapi.SearchRequest{
+		Body: strings.NewReader(q),
+		Size: &sz,
+	}
+
+	body, err := s.search(ctx, req)
+
+	if err != nil {
+		slog.Error("Count descendants query failed", "q", q)
+		return 0, fmt.Errorf("Failed to retrieve %d, %w", id, err)
+	}
+
+	r := gjson.GetBytes(body, "hits.total.value")
+	return r.Int(), nil
 }
 
 func (s *OpenSearchSpelunker) HasPlacetype(ctx context.Context, pg_opts pagination.Options, pt *placetypes.WOFPlacetype, filters []spelunker.Filter) (wof_spr.StandardPlacesResults, pagination.Results, error) {
@@ -158,4 +209,50 @@ func (s *OpenSearchSpelunker) GetConcordances(ctx context.Context) (*spelunker.F
 func (s *OpenSearchSpelunker) HasConcordance(ctx context.Context, pg_opts pagination.Options, namespace string, predicate string, value string, filters []spelunker.Filter) (wof_spr.StandardPlacesResults, pagination.Results, error) {
 
 	return nil, nil, spelunker.ErrNotImplemented
+}
+
+func (s *OpenSearchSpelunker) search(ctx context.Context, req *opensearchapi.SearchRequest) ([]byte, error) {
+
+	// https://pkg.go.dev/github.com/opensearch-project/opensearch-go/v2@v2.3.0/opensearchapi#SearchRequest
+
+	if len(req.Index) == 0 {
+		req.Index = []string{
+			s.index,
+		}
+	}
+
+	rsp, err := req.Do(ctx, s.client)
+
+	if err != nil {
+		return nil, fmt.Errorf("Failed to execute search, %w", err)
+	}
+
+	defer rsp.Body.Close()
+
+	if rsp.StatusCode != 200 {
+		slog.Error("Query failed", "status", rsp.StatusCode)
+		return nil, fmt.Errorf("Invalid status")
+	}
+
+	body, err := io.ReadAll(rsp.Body)
+
+	if err != nil {
+		return nil, fmt.Errorf("Failed to read response, %w", err)
+	}
+
+	return body, nil
+}
+
+func (s *OpenSearchSpelunker) propsToGeoJSON(props string) []byte {
+
+	// See this? It's a derived geometry. Still working through
+	// how to signal and how to fetch full geometry...
+
+	lat_rsp := gjson.Get(props, "geom:latitude")
+	lon_rsp := gjson.Get(props, "geom:longitude")
+
+	lat := lat_rsp.String()
+	lon := lon_rsp.String()
+
+	return []byte(`{"type": "Feature", "properties": ` + props + `, "geometry": { "type": "Point", "coordinates": [` + lon + `,` + lat + `] } }`)
 }

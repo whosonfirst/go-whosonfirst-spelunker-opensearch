@@ -20,7 +20,7 @@ Using the `wof-opensearch-index` tool from the [whosonfirst/go-whosonfirst-opens
 
 ```
 $> bin/wof-opensearch-index \
-	-writer-uri 'constant://?val=opensearch2%3A%2F%2Flocalhost%3A9200%2Fspelunker%3Fusername%3Dadmin%26password%3...%26debug%3Dtrue%26insecure%3Dtrue%26require-tls%3Dtrue' \
+	-writer-uri 'constant://?val=opensearch2%3A%2F%2Flocalhost%3A9200%2Fspelunker%3Fusername%3Dadmin%26password%3...%26insecure%3Dtrue%26require-tls%3Dtrue' \
 	/usr/local/data/whosonfirst-data-admin-ca/
 ```
 

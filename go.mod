@@ -5,7 +5,9 @@ go 1.22
 require (
 	github.com/aaronland/go-pagination v0.2.0
 	github.com/opensearch-project/opensearch-go/v2 v2.3.0
+	github.com/sfomuseum/go-edtf v1.1.1
 	github.com/tidwall/gjson v1.17.1
+	github.com/whosonfirst/go-whosonfirst-flags v0.5.1
 	github.com/whosonfirst/go-whosonfirst-opensearch v0.0.9
 	github.com/whosonfirst/go-whosonfirst-placetypes v0.7.1
 	github.com/whosonfirst/go-whosonfirst-spelunker v0.0.0-20240228164604-d1987c2473a1
@@ -48,7 +50,6 @@ require (
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
 	github.com/paulmach/go.geojson v1.4.0 // indirect
 	github.com/paulmach/orb v0.10.0 // indirect
-	github.com/sfomuseum/go-edtf v1.1.1 // indirect
 	github.com/sfomuseum/go-flags v0.10.0 // indirect
 	github.com/sfomuseum/go-geojsonld v1.0.0 // indirect
 	github.com/sfomuseum/go-http-auth v0.9.0 // indirect
@@ -64,7 +65,6 @@ require (
 	github.com/whosonfirst/go-reader v1.0.2 // indirect
 	github.com/whosonfirst/go-sanitize v0.1.0 // indirect
 	github.com/whosonfirst/go-whosonfirst-feature v0.0.27 // indirect
-	github.com/whosonfirst/go-whosonfirst-flags v0.5.1 // indirect
 	github.com/whosonfirst/go-whosonfirst-sources v0.1.1 // indirect
 	github.com/whosonfirst/go-whosonfirst-svg v0.1.0 // indirect
 	go.mongodb.org/mongo-driver v1.11.4 // indirect
