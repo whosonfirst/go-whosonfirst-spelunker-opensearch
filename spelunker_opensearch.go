@@ -3,12 +3,15 @@ package opensearch
 import (
 	"context"
 	"fmt"
+	"io"
 	_ "log/slog"
 	"net/url"
+	"strings"
 	"time"
 
 	"github.com/aaronland/go-pagination"
 	opensearch "github.com/opensearch-project/opensearch-go/v2"
+	"github.com/tidwall/gjson"
 	"github.com/whosonfirst/go-whosonfirst-opensearch/client"
 	"github.com/whosonfirst/go-whosonfirst-placetypes"
 	"github.com/whosonfirst/go-whosonfirst-spelunker"
@@ -57,7 +60,54 @@ func NewOpenSearchSpelunker(ctx context.Context, uri string) (spelunker.Spelunke
 
 func (s *OpenSearchSpelunker) GetById(ctx context.Context, id int64) ([]byte, error) {
 
-	return nil, spelunker.ErrNotImplemented
+	q := fmt.Sprintf(`{"query": { "ids": { "values": [ %d ] } } }`, id)
+
+	// v2/opensearchapi
+
+	rsp, err := s.client.Search(
+		s.client.Search.WithIndex("spelunker"),
+		s.client.Search.WithBody(strings.NewReader(q)),
+	)
+
+	if err != nil {
+		return nil, fmt.Errorf("Failed to execute search, %w", err)
+	}
+
+	// v3/opensearchapi
+
+	/*
+		req := &opensearchapi.SearchRequest{
+		        Body: strings.NewReader(q),
+		}
+
+		rsp, err := s.client.Search(ctx, req)
+
+		if err != nil {
+			return nil, fmt.Errorf("Failed to execute search, %w", err)
+		}
+	*/
+
+	defer rsp.Body.Close()
+
+	if rsp.StatusCode != 200 {
+		return nil, fmt.Errorf("Invalid status")
+	}
+
+	body, err := io.ReadAll(rsp.Body)
+
+	if err != nil {
+		return nil, fmt.Errorf("Failed to read response, %w", err)
+	}
+
+	r := gjson.GetBytes(body, "hits.hits.0._source")
+
+	if !r.Exists() {
+		return nil, fmt.Errorf("First hit missing")
+	}
+
+	// Need to turn this in to GeoJSON...
+
+	return []byte(r.String()), nil
 }
 
 func (s *OpenSearchSpelunker) GetAlternateGeometryById(ctx context.Context, id int64, alt_geom *uri.AltGeom) ([]byte, error) {
@@ -77,7 +127,7 @@ func (s *OpenSearchSpelunker) GetDescendantsFaceted(ctx context.Context, id int6
 
 func (s *OpenSearchSpelunker) CountDescendants(ctx context.Context, id int64) (int64, error) {
 
-	return 0, spelunker.ErrNotImplemented
+	return 0, nil // spelunker.ErrNotImplemented
 }
 
 func (s *OpenSearchSpelunker) HasPlacetype(ctx context.Context, pg_opts pagination.Options, pt *placetypes.WOFPlacetype, filters []spelunker.Filter) (wof_spr.StandardPlacesResults, pagination.Results, error) {

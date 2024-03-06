@@ -67,9 +67,23 @@ func ClientOptionsFromURI(ctx context.Context, uri string) (*ClientOptions, erro
 
 	q_debug := q.Get("debug")
 	q_insecure := q.Get("insecure")
+	q_tls := q.Get("require-tls")
 	q_username := q.Get("username")
 	q_password := q.Get("password") // update to use go-runtime
 	q_aws_credentials_uri := q.Get("aws-credentials-uri")
+
+	if q_tls != "" {
+
+		v, err := strconv.ParseBool(q_tls)
+
+		if err != nil {
+			return nil, fmt.Errorf("Failed to parse ?require-tls= parameter")
+		}
+
+		if v {
+			opensearch_endpoint = fmt.Sprintf("https://%s", u.Host)
+		}
+	}
 
 	os_client_opts := &ClientOptions{
 		Addresses:         []string{opensearch_endpoint},

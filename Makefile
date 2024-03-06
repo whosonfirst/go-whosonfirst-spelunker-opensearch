@@ -8,7 +8,8 @@ LDFLAG=-s -w
 OSPSWD=dkjfhsjdkfkjdjhksfhskd98475kjHkzjxckj
 
 # This probably won't work yet...
-SPELUNKER_URI=opensearch://?dsn=https://admin:$(OSPSWD)@localhost:9200
+SPELUNKER_URI=opensearch://?dsn=https%3A%2F%2Flocalhost%3A9200%2Fspelunker%3Fusername%3Dadmin%26password%3Ddkjfhsjdkfkjdjhksfhskd98475kjHkzjxckj%26insecure%3Dtrue%26require-tls%3Dtrue
+
 
 server:
 	go run -mod $(GOMOD) cmd/httpd/main.go \

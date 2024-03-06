@@ -11,7 +11,7 @@ import (
 
 	"github.com/aws/aws-sdk-go-v2/aws"
 	"github.com/aws/aws-sdk-go-v2/config"
-	"github.com/aws/aws-sdk-go-v2/credentials"	
+	"github.com/aws/aws-sdk-go-v2/credentials"
 )
 
 // null_cfg is a placeholder to return in error contexts.
@@ -35,8 +35,11 @@ func CredentialsStringPatterns() []string {
 
 // NewConfig() returns a new `aws.Config` derived from 'uri' which is expected to be configured
 // in the form of:
+//
 //	aws://{AWS_REGION}?credentials={CREDENTIALS_STRING}
+//
 // Where {AWS_REGION} is a valid AWS region name and {CREDENTIALS_STRING} is a string in the form of:
+//
 //	`anon:` Use anonymous credentials
 //	`env:` Use credentials derived from "AWS_" environment variables
 //	`iam:` Use IAM credentials
@@ -70,6 +73,7 @@ func NewConfig(ctx context.Context, uri string) (aws.Config, error) {
 
 // NewConfigWithCredentialsString() returns a new `aws.Config` derived from 'str_creds' which is expected to be passed
 // in as one of the following:
+//
 //	`anon:` Use anonymous credentials
 //	`env:` Use credentials derived from "AWS_" environment variables
 //	`iam:` Use IAM credentials
