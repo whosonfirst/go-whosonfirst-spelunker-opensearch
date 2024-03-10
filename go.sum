@@ -170,8 +170,8 @@ github.com/whosonfirst/go-whosonfirst-flags v0.4.3/go.mod h1:pL17Ryo60FH8RYaQRgf
 github.com/whosonfirst/go-whosonfirst-flags v0.5.1 h1:kRzXK7WZlEK1hNw+CECEdnWNtEDbWbjWdEg0imu1mGE=
 github.com/whosonfirst/go-whosonfirst-flags v0.5.1/go.mod h1:VgXcWNtsCZGy/Xnt9bpSUTKJ3nYeqXqvLD3NrE6kzZg=
 github.com/whosonfirst/go-whosonfirst-iterate/v2 v2.1.0/go.mod h1:aWeWB3DYX7bVtnNNRjCpMNZSsRgohX+FM7ukQ0cXXTY=
-github.com/whosonfirst/go-whosonfirst-opensearch v0.0.9 h1:OShXqYyOsrKX2AF0ST8+mNY1vHVaoCkQVVNrFg+RD78=
-github.com/whosonfirst/go-whosonfirst-opensearch v0.0.9/go.mod h1:Yhi2IkxZ17ddOCfTauxlnMkFJRJpCIU90yTdPvYQuYw=
+github.com/whosonfirst/go-whosonfirst-opensearch v0.0.10 h1:lHAuCvTtBIBg87mQU7ko973PvAh0cxyRokYVACU2kjo=
+github.com/whosonfirst/go-whosonfirst-opensearch v0.0.10/go.mod h1:2DWE3uIH9g3etxbz9epds//JUy+0lzFyoPqxq8agHJE=
 github.com/whosonfirst/go-whosonfirst-placetypes v0.3.0/go.mod h1:ez0VFkGFbgT2/z2oi3PIuW6FewsZ2+5glyfDD79XEHk=
 github.com/whosonfirst/go-whosonfirst-placetypes v0.7.1 h1:y8+cJ/GW+pei/5O0qvvoFbbvnd2XG3Qpav+Fk/77Cvc=
 github.com/whosonfirst/go-whosonfirst-placetypes v0.7.1/go.mod h1:Z9Rz7A2aTccdldVzVuuC2eG+R1dvz+sabtG9fA2i44Q=

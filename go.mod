@@ -8,7 +8,7 @@ require (
 	github.com/sfomuseum/go-edtf v1.1.1
 	github.com/tidwall/gjson v1.17.1
 	github.com/whosonfirst/go-whosonfirst-flags v0.5.1
-	github.com/whosonfirst/go-whosonfirst-opensearch v0.0.9
+	github.com/whosonfirst/go-whosonfirst-opensearch v0.0.10
 	github.com/whosonfirst/go-whosonfirst-placetypes v0.7.1
 	github.com/whosonfirst/go-whosonfirst-spelunker v0.0.0-20240228164604-d1987c2473a1
 	github.com/whosonfirst/go-whosonfirst-spelunker-httpd v0.0.0-20240305060935-b591673bd39e

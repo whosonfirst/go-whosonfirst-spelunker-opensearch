@@ -245,7 +245,7 @@ github.com/whosonfirst/go-whosonfirst-feature/properties
 ## explicit; go 1.18
 github.com/whosonfirst/go-whosonfirst-flags
 github.com/whosonfirst/go-whosonfirst-flags/existential
-# github.com/whosonfirst/go-whosonfirst-opensearch v0.0.9
+# github.com/whosonfirst/go-whosonfirst-opensearch v0.0.10
 ## explicit; go 1.21
 github.com/whosonfirst/go-whosonfirst-opensearch/client
 # github.com/whosonfirst/go-whosonfirst-placetypes v0.7.1
