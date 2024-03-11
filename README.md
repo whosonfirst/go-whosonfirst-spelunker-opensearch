@@ -30,6 +30,20 @@ opensearch2://localhost:9200/spelunker?require-tls=true&insecure=true&debug=fals
 
 The `wof-opensearch-index` application however expects a [gocloud.dev/runtimevar](https://gocloud.dev/howto/runtimevar/) URI so that you don't need to deply production configuration values with sensitive values (like OpenSearch admin passwords) exposed in them. Under the hood the `wof-opensearch-index` application is using the [sfomuseum/runtimevar](https://github.com/sfomuseum/runtimevar) package to manage the details and this needs to be updated to allow plain (non-runtimevar) strings. Or maybe the `wof-opensearch-index` application needs to be updated. Either way something needs to be updated to avoid the hassle of always needing to URL-escape things.
 
+## Tools
+
+### server
+
+```
+$> make server
+go run -mod vendor cmd/httpd/main.go \
+		-server-uri http://localhost:8080 \
+		-spelunker-uri 'opensearch://?dsn=https%3A%2F%2Flocalhost%3A9200%2Fspelunker%3Fusername%3Dadmin%26password%3Ddkjfhsjdkfkjdjhksfhskd98475kjHkzjxckj%26insecure%3Dtrue%26require-tls%3Dtrue'
+2024/03/11 09:06:51 INFO Listening for requests address=http://localhost:8080
+```
+
+See all the URL escaped gibberish in the `-spelunker-uri` flag? It's the same issues described in the docs for the `wof-opensearch-index` tool above.
+
 ## See also
 
 * https://github.com/whosonfirst/go-whosonfirst-spelunker
