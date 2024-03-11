@@ -109,50 +109,7 @@ func (s *OpenSearchSpelunker) GetDescendants(ctx context.Context, pg_opts pagina
 		return nil, nil, fmt.Errorf("Failed to retrieve %d, %w", id, err)
 	}
 
-	// START OF put me in a function
-
-	r := gjson.GetBytes(body, "hits.total.value")
-	count := r.Int()
-
-	var pg_results pagination.Results
-	var pg_err error
-
-	if pg_opts != nil {
-		pg_results, pg_err = countable.NewResultsFromCountWithOptions(pg_opts, count)
-	} else {
-		pg_results, pg_err = countable.NewResultsFromCount(count)
-	}
-
-	if pg_err != nil {
-		return nil, nil, pg_err
-	}
-
-	// START OF put me in a(nother) function
-
-	hits_r := gjson.GetBytes(body, "hits.hits")
-	count_hits := len(hits_r.Array())
-
-	results := make([]wof_spr.StandardPlacesResult, count_hits)
-
-	for idx, r := range hits_r.Array() {
-
-		src := r.Get("_source")
-		sp_spr, err := NewSpelunkerRecordSPR([]byte(src.String()))
-
-		if err != nil {
-			slog.Error("Failed to derive SPR from result", "q", q, "index", idx, "error", err)
-			return nil, nil, fmt.Errorf("Failed to derive SPR from result, %w", err)
-		}
-
-		results[idx] = sp_spr
-	}
-
-	spr_results := NewSpelunkerStandardPlacesResults(results)
-
-	// END OF put me in a(nother) function
-	// END OF put me in a function
-
-	return spr_results, pg_results, nil
+	return s.searchResultsToSPR(ctx, pg_opts, body)
 }
 
 func (s *OpenSearchSpelunker) GetDescendantsFaceted(ctx context.Context, id int64, filters []spelunker.Filter, facets []*spelunker.Facet) ([]*spelunker.Faceting, error) {
@@ -188,7 +145,21 @@ func (s *OpenSearchSpelunker) HasPlacetype(ctx context.Context, pg_opts paginati
 
 func (s *OpenSearchSpelunker) Search(ctx context.Context, pg_opts pagination.Options, search_opts *spelunker.SearchOptions) (wof_spr.StandardPlacesResults, pagination.Results, error) {
 
-	return nil, nil, spelunker.ErrNotImplemented
+	q := s.searchQuery(search_opts)
+
+	req := &opensearchapi.SearchRequest{
+		Body: strings.NewReader(q),
+
+		// pagination...
+	}
+
+	body, err := s.search(ctx, req)
+
+	if err != nil {
+		return nil, nil, fmt.Errorf("Failed to execute search, %w", err)
+	}
+
+	return s.searchResultsToSPR(ctx, pg_opts, body)
 }
 
 func (s *OpenSearchSpelunker) GetRecent(ctx context.Context, pg_opts pagination.Options, d time.Duration, filters []spelunker.Filter) (wof_spr.StandardPlacesResults, pagination.Results, error) {
@@ -255,4 +226,47 @@ func (s *OpenSearchSpelunker) propsToGeoJSON(props string) []byte {
 	lon := lon_rsp.String()
 
 	return []byte(`{"type": "Feature", "properties": ` + props + `, "geometry": { "type": "Point", "coordinates": [` + lon + `,` + lat + `] } }`)
+}
+
+func (s *OpenSearchSpelunker) searchResultsToSPR(ctx context.Context, pg_opts pagination.Options, body []byte) (wof_spr.StandardPlacesResults, pagination.Results, error) {
+
+	r := gjson.GetBytes(body, "hits.total.value")
+	count := r.Int()
+
+	var pg_results pagination.Results
+	var pg_err error
+
+	if pg_opts != nil {
+		pg_results, pg_err = countable.NewResultsFromCountWithOptions(pg_opts, count)
+	} else {
+		pg_results, pg_err = countable.NewResultsFromCount(count)
+	}
+
+	if pg_err != nil {
+		return nil, nil, pg_err
+	}
+
+	// START OF put me in a(nother) function
+
+	hits_r := gjson.GetBytes(body, "hits.hits")
+	count_hits := len(hits_r.Array())
+
+	results := make([]wof_spr.StandardPlacesResult, count_hits)
+
+	for idx, r := range hits_r.Array() {
+
+		src := r.Get("_source")
+		sp_spr, err := NewSpelunkerRecordSPR([]byte(src.String()))
+
+		if err != nil {
+			slog.Error("Failed to derive SPR from result", "index", idx, "error", err)
+			return nil, nil, fmt.Errorf("Failed to derive SPR from result, %w", err)
+		}
+
+		results[idx] = sp_spr
+	}
+
+	spr_results := NewSpelunkerStandardPlacesResults(results)
+
+	return spr_results, pg_results, nil
 }
