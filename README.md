@@ -14,9 +14,9 @@ This is work in progress and you should expect things to change, break or simply
 
 Note: All the examples assume a "local" setup meaning there is local instance of OpenSearch running on port 9200.
 
-* For an example of how to run a local OpenSearch instance from a Docker container [consult the `os` Makefile target in the package](https://github.com/whosonfirst/go-whosonfirst-spelunker-opensearch/blob/main/Makefile#L28-L36).
+* For an example of how to run a local OpenSearch instance from a Docker container [consult the `os` Makefile target](https://github.com/whosonfirst/go-whosonfirst-spelunker-opensearch/blob/main/Makefile#L28-L36) in this package.
 
-* For an example of how to create a "Spelunker" index and mappings in an OpenSearch index [consult the `spelunker-local` target in the `whosonfirst/whosonfirst-opensearch` package](https://github.com/whosonfirst/whosonfirst-opensearch/blob/main/Makefile#L5-L15)
+* For an example of how to create a "Spelunker" index and mappings in an OpenSearch index [consult the `spelunker-local` target](https://github.com/whosonfirst/whosonfirst-opensearch/blob/main/Makefile#L5-L15) in the `whosonfirst/whosonfirst-opensearch` package.
 
 ### Indexing
 
