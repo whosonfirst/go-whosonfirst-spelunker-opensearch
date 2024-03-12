@@ -15,7 +15,7 @@ import (
 
 func (s *OpenSearchSpelunker) GetDescendants(ctx context.Context, pg_opts pagination.Options, id int64, filters []spelunker.Filter) (wof_spr.StandardPlacesResults, pagination.Results, error) {
 
-	q := s.descendantsQuery(id)
+	q := s.descendantsQuery(id, filters)
 	sz := int(pg_opts.PerPage())
 
 	req := &opensearchapi.SearchRequest{
@@ -36,13 +36,24 @@ func (s *OpenSearchSpelunker) GetDescendants(ctx context.Context, pg_opts pagina
 
 func (s *OpenSearchSpelunker) GetDescendantsFaceted(ctx context.Context, id int64, filters []spelunker.Filter, facets []*spelunker.Facet) ([]*spelunker.Faceting, error) {
 
-	return nil, spelunker.ErrNotImplemented
+	q := s.descendantsFacetedQuery(id, filters, facets)
+
+	sz := 0
+
+	req := &opensearchapi.SearchRequest{
+		Body: strings.NewReader(q),
+		Size: &sz,
+	}
+
+	return s.facet(ctx, req, facets)
 }
 
 func (s *OpenSearchSpelunker) CountDescendants(ctx context.Context, id int64) (int64, error) {
 
-	q := s.descendantsQuery(id)
-	sz := 1
+	filters := make([]spelunker.Filter, 0)
+
+	q := s.descendantsQuery(id, filters)
+	sz := 0
 
 	req := &opensearchapi.SearchRequest{
 		Body: strings.NewReader(q),

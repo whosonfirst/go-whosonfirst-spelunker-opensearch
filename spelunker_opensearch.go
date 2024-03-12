@@ -114,6 +114,65 @@ func (s *OpenSearchSpelunker) GetRecent(ctx context.Context, pg_opts pagination.
 	return nil, nil, spelunker.ErrNotImplemented
 }
 
+func (s *OpenSearchSpelunker) facet(ctx context.Context, req *opensearchapi.SearchRequest, facets []*spelunker.Facet) ([]*spelunker.Faceting, error) {
+
+	body, err := s.search(ctx, req)
+
+	if err != nil {
+		return nil, fmt.Errorf("Failed to query facets, %w", err)
+	}
+
+	aggs_rsp := gjson.GetBytes(body, "aggregations")
+
+	if !aggs_rsp.Exists() {
+		return nil, fmt.Errorf("Failed to derive facets, missing")
+	}
+
+	facetings := make([]*spelunker.Faceting, 0)
+
+	for k, rsp := range aggs_rsp.Map() {
+
+		facet_results := make([]*spelunker.FacetCount, 0)
+
+		buckets_rsp := rsp.Get("buckets")
+
+		for _, b := range buckets_rsp.Array() {
+
+			k_rsp := b.Get("key")
+			v_rsp := b.Get("doc_count")
+
+			fc := &spelunker.FacetCount{
+				Key:   k_rsp.String(),
+				Count: v_rsp.Int(),
+			}
+
+			facet_results = append(facet_results, fc)
+		}
+
+		var bucket_facet *spelunker.Facet
+
+		for _, f := range facets {
+			if f.String() == k {
+				bucket_facet = f
+				break
+			}
+		}
+
+		if bucket_facet == nil {
+			return nil, fmt.Errorf("Failed to determine facet for bucket key '%s'", k)
+		}
+
+		faceting := &spelunker.Faceting{
+			Facet:   bucket_facet,
+			Results: facet_results,
+		}
+
+		facetings = append(facetings, faceting)
+	}
+
+	return facetings, nil
+}
+
 func (s *OpenSearchSpelunker) search(ctx context.Context, req *opensearchapi.SearchRequest) ([]byte, error) {
 
 	// https://pkg.go.dev/github.com/opensearch-project/opensearch-go/v2@v2.3.0/opensearchapi#SearchRequest
@@ -133,6 +192,10 @@ func (s *OpenSearchSpelunker) search(ctx context.Context, req *opensearchapi.Sea
 	defer rsp.Body.Close()
 
 	if rsp.StatusCode != 200 {
+
+		// body, _ := io.ReadAll(rsp.Body)
+		// slog.Error(string(body))
+
 		slog.Error("Query failed", "status", rsp.StatusCode)
 		return nil, fmt.Errorf("Invalid status")
 	}
