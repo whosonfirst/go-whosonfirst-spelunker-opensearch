@@ -37,7 +37,6 @@ func (s *OpenSearchSpelunker) GetDescendants(ctx context.Context, pg_opts pagina
 func (s *OpenSearchSpelunker) GetDescendantsFaceted(ctx context.Context, id int64, filters []spelunker.Filter, facets []*spelunker.Facet) ([]*spelunker.Faceting, error) {
 
 	q := s.descendantsFacetedQuery(id, filters, facets)
-
 	sz := 0
 
 	req := &opensearchapi.SearchRequest{
