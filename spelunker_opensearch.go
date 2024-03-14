@@ -94,12 +94,46 @@ func (s *OpenSearchSpelunker) Search(ctx context.Context, pg_opts pagination.Opt
 
 	q := s.searchQuery(search_opts)
 
-	req := &opensearchapi.SearchRequest{
-		Body: strings.NewReader(q),
+	//
 
-		// pagination...
+	if pg_opts.Method() == pagination.Cursor {
+
+		scroll_id := pg_opts.Pointer().(string)
+
+		if scroll_id != "" {
+
+			// Something...
+		}
+	}
+	
+	pre_count := false
+	scroll_trigger := int64(10000)
+	use_scroll := false
+	
+	if pre_count {
+
+		count, err := s.countForQuery(ctx, q)
+
+		if err != nil {
+			return nil, nil, err
+		}
+
+		if count >= scroll_trigger {
+			use_scroll = true
+		}
 	}
 
+	sz := int(pg_opts.PerPage())
+	
+	req := &opensearchapi.SearchRequest{
+		Body: strings.NewReader(q),
+		Size: &sz,
+	}
+
+	if use_scroll {
+		req.Scroll = 5 * time.Minute
+	}
+	
 	body, err := s.search(ctx, req)
 
 	if err != nil {
@@ -173,6 +207,8 @@ func (s *OpenSearchSpelunker) facet(ctx context.Context, req *opensearchapi.Sear
 	return facetings, nil
 }
 
+// https://pkg.go.dev/github.com/opensearch-project/opensearch-go/v2/opensearchapi#ScrollRequest
+
 func (s *OpenSearchSpelunker) search(ctx context.Context, req *opensearchapi.SearchRequest) ([]byte, error) {
 
 	// https://pkg.go.dev/github.com/opensearch-project/opensearch-go/v2@v2.3.0/opensearchapi#SearchRequest
@@ -221,6 +257,27 @@ func (s *OpenSearchSpelunker) propsToGeoJSON(props string) []byte {
 	lon := lon_rsp.String()
 
 	return []byte(`{"type": "Feature", "properties": ` + props + `, "geometry": { "type": "Point", "coordinates": [` + lon + `,` + lat + `] } }`)
+}
+
+func (s *OpenSearchSpelunker) countForQuery(ctx context.Context, q string) (int64, error) {
+
+	sz := 0
+	
+	req := &opensearchapi.SearchRequest{
+		Body: strings.NewReader(q),
+		Size: &sz,
+	}
+	
+	body, err := s.search(ctx, req)
+
+	if err != nil {
+		return 0, fmt.Errorf("Failed to determine count for query, %w", err)
+	}
+	
+	r := gjson.GetBytes(body, "hits.total.value")
+	count := r.Int()
+
+	return count, nil
 }
 
 func (s *OpenSearchSpelunker) searchResultsToSPR(ctx context.Context, pg_opts pagination.Options, body []byte) (wof_spr.StandardPlacesResults, pagination.Results, error) {
