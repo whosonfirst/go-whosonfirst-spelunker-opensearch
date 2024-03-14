@@ -20,6 +20,9 @@ import (
 	"github.com/whosonfirst/go-whosonfirst-uri"
 )
 
+const scroll_duration time.Duration = 5 * time.Minute
+const scroll_trigger int64 = 10000
+
 type OpenSearchSpelunker struct {
 	spelunker.Spelunker
 	client *opensearch.Client
@@ -69,7 +72,7 @@ func (s *OpenSearchSpelunker) GetById(ctx context.Context, id int64) ([]byte, er
 		Body: strings.NewReader(q),
 	}
 
-	body, err := s.search(ctx, req)
+	body, err := s.searchWithIndex(ctx, req)
 
 	if err != nil {
 		slog.Error("Get by ID query failed", "q", q)
@@ -93,54 +96,7 @@ func (s *OpenSearchSpelunker) GetAlternateGeometryById(ctx context.Context, id i
 func (s *OpenSearchSpelunker) Search(ctx context.Context, pg_opts pagination.Options, search_opts *spelunker.SearchOptions) (wof_spr.StandardPlacesResults, pagination.Results, error) {
 
 	q := s.searchQuery(search_opts)
-
-	//
-
-	if pg_opts.Method() == pagination.Cursor {
-
-		scroll_id := pg_opts.Pointer().(string)
-
-		if scroll_id != "" {
-
-			// Something...
-		}
-	}
-	
-	pre_count := false
-	scroll_trigger := int64(10000)
-	use_scroll := false
-	
-	if pre_count {
-
-		count, err := s.countForQuery(ctx, q)
-
-		if err != nil {
-			return nil, nil, err
-		}
-
-		if count >= scroll_trigger {
-			use_scroll = true
-		}
-	}
-
-	sz := int(pg_opts.PerPage())
-	
-	req := &opensearchapi.SearchRequest{
-		Body: strings.NewReader(q),
-		Size: &sz,
-	}
-
-	if use_scroll {
-		req.Scroll = 5 * time.Minute
-	}
-	
-	body, err := s.search(ctx, req)
-
-	if err != nil {
-		return nil, nil, fmt.Errorf("Failed to execute search, %w", err)
-	}
-
-	return s.searchResultsToSPR(ctx, pg_opts, body)
+	return s.searchPaginated(ctx, pg_opts, q)
 }
 
 func (s *OpenSearchSpelunker) GetRecent(ctx context.Context, pg_opts pagination.Options, d time.Duration, filters []spelunker.Filter) (wof_spr.StandardPlacesResults, pagination.Results, error) {
@@ -150,7 +106,7 @@ func (s *OpenSearchSpelunker) GetRecent(ctx context.Context, pg_opts pagination.
 
 func (s *OpenSearchSpelunker) facet(ctx context.Context, req *opensearchapi.SearchRequest, facets []*spelunker.Facet) ([]*spelunker.Faceting, error) {
 
-	body, err := s.search(ctx, req)
+	body, err := s.searchWithIndex(ctx, req)
 
 	if err != nil {
 		return nil, fmt.Errorf("Failed to query facets, %w", err)
@@ -207,17 +163,113 @@ func (s *OpenSearchSpelunker) facet(ctx context.Context, req *opensearchapi.Sear
 	return facetings, nil
 }
 
-// https://pkg.go.dev/github.com/opensearch-project/opensearch-go/v2/opensearchapi#ScrollRequest
+// searchPaginated wraps all the logic for determining whether to do a cursor-based or plain-vanilla-paginated query
+func (s *OpenSearchSpelunker) searchPaginated(ctx context.Context, pg_opts pagination.Options, q string) (wof_spr.StandardPlacesResults, pagination.Results, error) {
 
-func (s *OpenSearchSpelunker) search(ctx context.Context, req *opensearchapi.SearchRequest) ([]byte, error) {
+	scroll_id := ""
+	pre_count := false
+	use_scroll := false
 
-	// https://pkg.go.dev/github.com/opensearch-project/opensearch-go/v2@v2.3.0/opensearchapi#SearchRequest
+	if pg_opts.Method() == pagination.Cursor {
+		slog.Info("CURSOR")
+		scroll_id = pg_opts.Pointer().(string)
+	}
+
+	if scroll_id == "" {
+		slog.Info("PRECOUNT")
+		pre_count = true
+	}
+
+	if pre_count {
+
+		count, err := s.countForQuery(ctx, q)
+
+		slog.Info("COUNT", "count", count, "error", err)
+		if err != nil {
+			return nil, nil, err
+		}
+
+		if count >= scroll_trigger {
+			use_scroll = true
+		}
+	}
+
+	var body []byte
+	var err error
+
+	if scroll_id != "" {
+
+		req := &opensearchapi.ScrollRequest{
+			Body:     strings.NewReader(q),
+			ScrollID: scroll_id,
+			Scroll:   scroll_duration,
+		}
+
+		body, err = s.searchWithScroll(ctx, req)
+
+	} else {
+
+		sz := int(pg_opts.PerPage())
+
+		req := &opensearchapi.SearchRequest{
+			Body: strings.NewReader(q),
+			Size: &sz,
+		}
+
+		if use_scroll {
+			slog.Info("USE SCROLL")
+			req.Scroll = scroll_duration
+		}
+
+		body, err = s.searchWithIndex(ctx, req)
+	}
+
+	if err != nil {
+		return nil, nil, fmt.Errorf("Failed to execute search, %w", err)
+	}
+
+	return s.searchResultsToSPR(ctx, pg_opts, body)
+}
+
+// https://pkg.go.dev/github.com/opensearch-project/opensearch-go/v2@v2.3.0/opensearchapi#SearchRequest
+
+func (s *OpenSearchSpelunker) searchWithIndex(ctx context.Context, req *opensearchapi.SearchRequest) ([]byte, error) {
 
 	if len(req.Index) == 0 {
 		req.Index = []string{
 			s.index,
 		}
 	}
+
+	rsp, err := req.Do(ctx, s.client)
+
+	if err != nil {
+		return nil, fmt.Errorf("Failed to execute search, %w", err)
+	}
+
+	defer rsp.Body.Close()
+
+	if rsp.StatusCode != 200 {
+
+		// body, _ := io.ReadAll(rsp.Body)
+		// slog.Error(string(body))
+
+		slog.Error("Query failed", "status", rsp.StatusCode)
+		return nil, fmt.Errorf("Invalid status")
+	}
+
+	body, err := io.ReadAll(rsp.Body)
+
+	if err != nil {
+		return nil, fmt.Errorf("Failed to read response, %w", err)
+	}
+
+	return body, nil
+}
+
+// https://pkg.go.dev/github.com/opensearch-project/opensearch-go/v2/opensearchapi#ScrollRequest
+
+func (s *OpenSearchSpelunker) searchWithScroll(ctx context.Context, req *opensearchapi.ScrollRequest) ([]byte, error) {
 
 	rsp, err := req.Do(ctx, s.client)
 
@@ -262,18 +314,18 @@ func (s *OpenSearchSpelunker) propsToGeoJSON(props string) []byte {
 func (s *OpenSearchSpelunker) countForQuery(ctx context.Context, q string) (int64, error) {
 
 	sz := 0
-	
+
 	req := &opensearchapi.SearchRequest{
 		Body: strings.NewReader(q),
 		Size: &sz,
 	}
-	
-	body, err := s.search(ctx, req)
+
+	body, err := s.searchWithIndex(ctx, req)
 
 	if err != nil {
 		return 0, fmt.Errorf("Failed to determine count for query, %w", err)
 	}
-	
+
 	r := gjson.GetBytes(body, "hits.total.value")
 	count := r.Int()
 
