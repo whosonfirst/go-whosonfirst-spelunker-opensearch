@@ -11,6 +11,7 @@ import (
 
 	"github.com/aaronland/go-pagination"
 	"github.com/aaronland/go-pagination/countable"
+	"github.com/aaronland/go-pagination/cursor"	
 	opensearch "github.com/opensearch-project/opensearch-go/v2"
 	opensearchapi "github.com/opensearch-project/opensearch-go/v2/opensearchapi"
 	"github.com/tidwall/gjson"
@@ -19,6 +20,23 @@ import (
 	wof_spr "github.com/whosonfirst/go-whosonfirst-spr/v2"
 	"github.com/whosonfirst/go-whosonfirst-uri"
 )
+
+/*
+
+2024/03/14 09:16:16 INFO COUNT count=10000 error=<nil>
+2024/03/14 09:16:16 INFO USE SCROLL
+2024/03/14 09:16:16 INFO to spr count=62259 scroll=FGluY2x1ZGVfY29udGV4dF91dWlkDXF1ZXJ5QW5kRmV0Y2gBFjM1S0daQlBOUUV1dnphRHkxT0VoQ2cAAAAAAAAAwBZuYzhqaWtTdFNGU2pEN3ZLWWZ5R2tn
+fatal error: concurrent map read and map write
+
+goroutine 934 [running]:
+github.com/aaronland/go-http-server/handler.deriveHandler(0x0?, 0xc0004dcb10, 0xc0004de600, {0xc000130600?, 0xc0005e1a80?, 0x64b5af8?})
+	/Users/asc/go/pkg/mod/github.com/aaronland/go-http-server@v1.4.0/handler/route.go:213 +0x33d
+github.com/aaronland/go-http-server/handler.RouteHandlerWithOptions.func2({0x70cf9a0, 0xc00051c7e0}, 0xc000504480)
+	/Users/asc/go/pkg/mod/github.com/aaronland/go-http-server@v1.4.0/handler/route.go:109 +0x5c
+net/http.HandlerFunc.ServeHTTP(0xc0005ad2b0?, {0x70cf9a0?, 0xc00051c7e0?}, 0x67aef3a?)
+	/usr/local/go/src/net/http/server.go:2166 +0x29
+
+*/
 
 const scroll_duration time.Duration = 5 * time.Minute
 const scroll_trigger int64 = 10000
@@ -334,18 +352,35 @@ func (s *OpenSearchSpelunker) countForQuery(ctx context.Context, q string) (int6
 
 func (s *OpenSearchSpelunker) searchResultsToSPR(ctx context.Context, pg_opts pagination.Options, body []byte) (wof_spr.StandardPlacesResults, pagination.Results, error) {
 
-	r := gjson.GetBytes(body, "hits.total.value")
-	count := r.Int()
+	scroll_rsp := gjson.GetBytes(body, "_scroll_id")
+	scroll_id := scroll_rsp.String()
+	
+	total_rsp := gjson.GetBytes(body, "hits.total.value")
+	count := total_rsp.Int()
 
+	slog.Info("to spr", "count", count, "scroll", scroll_id)
+	
 	var pg_results pagination.Results
 	var pg_err error
 
-	if pg_opts != nil {
-		pg_results, pg_err = countable.NewResultsFromCountWithOptions(pg_opts, count)
-	} else {
-		pg_results, pg_err = countable.NewResultsFromCount(count)
-	}
+	if scroll_id != "" {
 
+		c_results := new(cursor.CursorResults)
+		c_results.TotalCount = count
+		c_results.PerPageCount = pg_opts.PerPage()
+		c_results.CursorNext = scroll_id
+
+		pg_results = c_results
+		
+	} else {
+		
+		if pg_opts != nil {
+			pg_results, pg_err = countable.NewResultsFromCountWithOptions(pg_opts, count)
+		} else {
+			pg_results, pg_err = countable.NewResultsFromCount(count)
+		}
+	}
+	
 	if pg_err != nil {
 		return nil, nil, pg_err
 	}
