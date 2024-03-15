@@ -3,7 +3,7 @@ module github.com/whosonfirst/go-whosonfirst-spelunker-opensearch
 go 1.22
 
 require (
-	github.com/aaronland/go-pagination v0.2.0
+	github.com/aaronland/go-pagination v0.3.0
 	github.com/opensearch-project/opensearch-go/v2 v2.3.0
 	github.com/sfomuseum/go-edtf v1.1.1
 	github.com/tidwall/gjson v1.17.1

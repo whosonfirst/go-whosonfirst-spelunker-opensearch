@@ -10,6 +10,7 @@ import (
 	"github.com/whosonfirst/go-whosonfirst-flags"
 	"github.com/whosonfirst/go-whosonfirst-flags/existential"
 	wof_spr "github.com/whosonfirst/go-whosonfirst-spr/v2"
+	"github.com/whosonfirst/go-whosonfirst-uri"
 )
 
 type SpelunkerRecordSPR struct {
@@ -69,11 +70,14 @@ func (s *SpelunkerRecordSPR) Repo() string {
 }
 
 func (s *SpelunkerRecordSPR) Path() string {
-	return ""
+
+	id := gjson.GetBytes(s.props, "wof:id").Int()
+	path, _ := uri.Id2RelPath(id)
+	return path
 }
 
 func (s *SpelunkerRecordSPR) URI() string {
-	return ""
+	return s.Path()
 }
 
 func (s *SpelunkerRecordSPR) Inception() *edtf.EDTFDate {

@@ -5,13 +5,14 @@ import (
 	"fmt"
 	"io"
 	"log/slog"
+	"math"
 	"net/url"
 	"strings"
 	"time"
 
 	"github.com/aaronland/go-pagination"
 	"github.com/aaronland/go-pagination/countable"
-	"github.com/aaronland/go-pagination/cursor"	
+	"github.com/aaronland/go-pagination/cursor"
 	opensearch "github.com/opensearch-project/opensearch-go/v2"
 	opensearchapi "github.com/opensearch-project/opensearch-go/v2/opensearchapi"
 	"github.com/tidwall/gjson"
@@ -189,12 +190,10 @@ func (s *OpenSearchSpelunker) searchPaginated(ctx context.Context, pg_opts pagin
 	use_scroll := false
 
 	if pg_opts.Method() == pagination.Cursor {
-		slog.Info("CURSOR")
 		scroll_id = pg_opts.Pointer().(string)
 	}
 
 	if scroll_id == "" {
-		slog.Info("PRECOUNT")
 		pre_count = true
 	}
 
@@ -202,7 +201,6 @@ func (s *OpenSearchSpelunker) searchPaginated(ctx context.Context, pg_opts pagin
 
 		count, err := s.countForQuery(ctx, q)
 
-		slog.Info("COUNT", "count", count, "error", err)
 		if err != nil {
 			return nil, nil, err
 		}
@@ -217,6 +215,11 @@ func (s *OpenSearchSpelunker) searchPaginated(ctx context.Context, pg_opts pagin
 
 	if scroll_id != "" {
 
+		// See this? Neither of these things are documented anywhere.
+		// Good times...
+		scroll_id = strings.TrimLeft(scroll_id, "after-")
+		q = fmt.Sprintf(`{"scroll_id": "%s"}`, scroll_id)
+
 		req := &opensearchapi.ScrollRequest{
 			Body:     strings.NewReader(q),
 			ScrollID: scroll_id,
@@ -229,19 +232,23 @@ func (s *OpenSearchSpelunker) searchPaginated(ctx context.Context, pg_opts pagin
 
 		sz := int(pg_opts.PerPage())
 
+		from := int(pg_opts.PerPage() * (pg_opts.Pointer().(int64) - 1))
+
 		req := &opensearchapi.SearchRequest{
 			Body: strings.NewReader(q),
 			Size: &sz,
+			From: &from,
 		}
 
 		if use_scroll {
-			slog.Info("USE SCROLL")
 			req.Scroll = scroll_duration
 		}
 
 		body, err = s.searchWithIndex(ctx, req)
 	}
 
+	// To do: Check for expired scroll
+	
 	if err != nil {
 		return nil, nil, fmt.Errorf("Failed to execute search, %w", err)
 	}
@@ -297,6 +304,8 @@ func (s *OpenSearchSpelunker) searchWithScroll(ctx context.Context, req *opensea
 
 	defer rsp.Body.Close()
 
+	// To do: Check for expired cursor...
+	
 	if rsp.StatusCode != 200 {
 
 		// body, _ := io.ReadAll(rsp.Body)
@@ -354,33 +363,34 @@ func (s *OpenSearchSpelunker) searchResultsToSPR(ctx context.Context, pg_opts pa
 
 	scroll_rsp := gjson.GetBytes(body, "_scroll_id")
 	scroll_id := scroll_rsp.String()
-	
+
 	total_rsp := gjson.GetBytes(body, "hits.total.value")
 	count := total_rsp.Int()
 
-	slog.Info("to spr", "count", count, "scroll", scroll_id)
-	
 	var pg_results pagination.Results
 	var pg_err error
 
 	if scroll_id != "" {
 
+		page_count := math.Ceil(float64(count) / float64(pg_opts.PerPage()))
+
 		c_results := new(cursor.CursorResults)
 		c_results.TotalCount = count
 		c_results.PerPageCount = pg_opts.PerPage()
 		c_results.CursorNext = scroll_id
+		c_results.PageCount = int64(page_count)
 
 		pg_results = c_results
-		
+
 	} else {
-		
+
 		if pg_opts != nil {
 			pg_results, pg_err = countable.NewResultsFromCountWithOptions(pg_opts, count)
 		} else {
 			pg_results, pg_err = countable.NewResultsFromCount(count)
 		}
 	}
-	
+
 	if pg_err != nil {
 		return nil, nil, pg_err
 	}
