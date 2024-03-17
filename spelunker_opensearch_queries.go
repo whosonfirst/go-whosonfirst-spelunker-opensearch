@@ -27,26 +27,31 @@ func (s OpenSearchSpelunker) hasPlacetypesQuery(pt string, filters []spelunker.F
 
 func (s OpenSearchSpelunker) matchAllFacetedQuery(facets []*spelunker.Facet) string {
 
-	count_facets := len(facets)
-	aggs := make([]string, count_facets)
-
-	for i, f := range facets {
-
-		// This will probably need to be done in a switch statement eventually...
-		facet_field := fmt.Sprintf("wof:%s", f)
-
-		aggs[i] = fmt.Sprintf(`"%s": { "terms": { "field": "%s", "size": 1000 } }`, f, facet_field)
-	}
-
-	str_aggs := strings.Join(aggs, ",")
-
+	str_aggs := s.facetsToAggregations(facets)
 	return fmt.Sprintf(`{"query": { "match_all": {} }, "aggs": { %s } }`, str_aggs)
+}
+
+func (s OpenSearchSpelunker) hasPlacetypeFacetedQuery(pt string, filters []spelunker.Filter, facets []*spelunker.Facet) string {
+
+	str_aggs := s.facetsToAggregations(facets)	
+	return fmt.Sprintf(`{"query": { "term": { "wof:placetype":  "%s"  } }, "aggs": { %s } }`, pt, str_aggs)
 }
 
 // https://opensearch.org/docs/latest/aggregations/
 // https://opensearch.org/docs/latest/aggregations/bucket/terms/
 
 func (s OpenSearchSpelunker) descendantsFacetedQuery(id int64, filters []spelunker.Filter, facets []*spelunker.Facet) string {
+	
+	str_aggs := s.facetsToAggregations(facets)
+	return fmt.Sprintf(`{"query": { "term": { "wof:belongsto":  %d  } }, "aggs": { %s } }`, id, str_aggs)
+}
+
+func (s OpenSearchSpelunker) searchQuery(search_opts *spelunker.SearchOptions) string {
+
+	return fmt.Sprintf(`{"query": { "term": { "names_all": "%s" } } }`, search_opts.Query)
+}
+
+func (s OpenSearchSpelunker) facetsToAggregations(facets []*spelunker.Facet) string {
 
 	count_facets := len(facets)
 	aggs := make([]string, count_facets)
@@ -59,12 +64,5 @@ func (s OpenSearchSpelunker) descendantsFacetedQuery(id int64, filters []spelunk
 		aggs[i] = fmt.Sprintf(`"%s": { "terms": { "field": "%s", "size": 1000 } }`, f, facet_field)
 	}
 
-	str_aggs := strings.Join(aggs, ",")
-
-	return fmt.Sprintf(`{"query": { "term": { "wof:belongsto":  %d  } }, "aggs": { %s } }`, id, str_aggs)
-}
-
-func (s OpenSearchSpelunker) searchQuery(search_opts *spelunker.SearchOptions) string {
-
-	return fmt.Sprintf(`{"query": { "term": { "names_all": "%s" } } }`, search_opts.Query)
+	return strings.Join(aggs, ",")	
 }

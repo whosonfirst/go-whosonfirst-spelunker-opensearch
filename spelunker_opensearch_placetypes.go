@@ -18,6 +18,20 @@ func (s *OpenSearchSpelunker) HasPlacetype(ctx context.Context, pg_opts paginati
 	return s.searchPaginated(ctx, pg_opts, q)
 }
 
+func (s *OpenSearchSpelunker) HasPlacetypeFaceted(ctx context.Context, pt *placetypes.WOFPlacetype, filters []spelunker.Filter, facets []*spelunker.Facet) ([]*spelunker.Faceting, error) {
+
+	q := s.hasPlacetypeFacetedQuery(pt.Name, filters, facets)
+	sz := 0
+
+	req := &opensearchapi.SearchRequest{
+		Body: strings.NewReader(q),
+		Size: &sz,
+	}
+
+	return s.facet(ctx, req, facets)	
+}
+
+
 func (s *OpenSearchSpelunker) GetPlacetypes(ctx context.Context) (*spelunker.Faceting, error) {
 
 	pt_facet := spelunker.NewFacet("placetype")
