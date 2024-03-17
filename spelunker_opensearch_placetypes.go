@@ -14,7 +14,7 @@ import (
 
 func (s *OpenSearchSpelunker) HasPlacetype(ctx context.Context, pg_opts pagination.Options, pt *placetypes.WOFPlacetype, filters []spelunker.Filter) (wof_spr.StandardPlacesResults, pagination.Results, error) {
 
-	q := s.hasPlacetypesQuery(pt.Name, filters)
+	q := s.hasPlacetypeQuery(pt.Name, filters)
 	return s.searchPaginated(ctx, pg_opts, q)
 }
 

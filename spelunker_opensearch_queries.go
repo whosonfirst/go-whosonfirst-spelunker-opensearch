@@ -20,33 +20,61 @@ func (s OpenSearchSpelunker) idQuery(id int64) string {
 
 func (s OpenSearchSpelunker) descendantsQuery(id int64, filters []spelunker.Filter) string {
 
+	q := s.descendantsQueryCriteria(id, filters)
+	return fmt.Sprintf(`{"query": %s }`, q)
+}
+
+func (s OpenSearchSpelunker) descendantsFacetedQuery(id int64, filters []spelunker.Filter, facets []*spelunker.Facet) string {
+
+	q := s.descendantsQueryCriteria(id, filters)
+	str_aggs := s.facetsToAggregations(facets)
+	
+	return fmt.Sprintf(`{"query": %s }, "aggs": { %s } }`, q, str_aggs)
+}
+
+func (s OpenSearchSpelunker) descendantsQueryCriteria(id int64, filters []spelunker.Filter) string {
+
+	q := fmt.Sprintf(`{ "term": { "wof:belongsto":  %d  } }`, id)
+	
 	if len(filters) == 0 {
-		return fmt.Sprintf(`{"query": { "term": { "wof:belongsto":  %d  } } }`, id)
+		return q
 	}
 
 	must := []string{
-		fmt.Sprintf(`{ "term": { "wof:belongsto":  %d  } } `, id),
+		q,
 	}
 
-	for _, f := range filters {
-
-		switch f.Scheme() {
-		case "placetype":
-			must = append(must, fmt.Sprintf(`{ "term": { "wof:placetype": "%s" } }`, f.Value()))
-		case "country":
-			must = append(must, fmt.Sprintf(`{ "term": { "wof:country": "%s" } }`, f.Value()))			
-		default:
-			slog.Warn("Unsupported filter scheme", "scheme", f.Scheme())
-		}
-	}
-	
-	str_must := strings.Join(must, ",")
-	
-	return fmt.Sprintf(`{"query": { "bool": { "must": [ %s ] } } }`, str_must)
+	return s.mustQueryWithFiltersCriteria(must, filters)
+	return fmt.Sprintf(`{"query": %s }`, q)	
 }
 
-func (s OpenSearchSpelunker) hasPlacetypesQuery(pt string, filters []spelunker.Filter) string {
-	return fmt.Sprintf(`{"query": { "term": { "wof:placetype":  "%s"  } } }`, pt)
+func (s OpenSearchSpelunker) hasPlacetypeQuery(pt string, filters []spelunker.Filter) string {
+
+	q := s.hasPlacetypeQueryCriteria(pt, filters)
+	return fmt.Sprintf(`{"query": %s }`, q)		
+}
+
+func (s OpenSearchSpelunker) hasPlacetypeFacetedQuery(pt string, filters []spelunker.Filter, facets []*spelunker.Facet) string {
+
+	q := s.hasPlacetypeQueryCriteria(pt, filters)
+	str_aggs := s.facetsToAggregations(facets)
+	
+	return fmt.Sprintf(`{"query": %s }, "aggs": { %s } }`, q, str_aggs)
+}
+
+func (s OpenSearchSpelunker) hasPlacetypeQueryCriteria(pt string, filters []spelunker.Filter) string {
+
+	q := fmt.Sprintf(`{ "term": { "wof:placetype":  "%s"  } }`, pt)
+	
+	if len(filters) == 0 {
+		return q
+	}
+
+	must := []string{
+		q,
+	}
+
+	return s.mustQueryWithFiltersCriteria(must, filters)	
 }
 
 func (s OpenSearchSpelunker) matchAllFacetedQuery(facets []*spelunker.Facet) string {
@@ -55,20 +83,9 @@ func (s OpenSearchSpelunker) matchAllFacetedQuery(facets []*spelunker.Facet) str
 	return fmt.Sprintf(`{"query": { "match_all": {} }, "aggs": { %s } }`, str_aggs)
 }
 
-func (s OpenSearchSpelunker) hasPlacetypeFacetedQuery(pt string, filters []spelunker.Filter, facets []*spelunker.Facet) string {
-
-	str_aggs := s.facetsToAggregations(facets)	
-	return fmt.Sprintf(`{"query": { "term": { "wof:placetype":  "%s"  } }, "aggs": { %s } }`, pt, str_aggs)
-}
 
 // https://opensearch.org/docs/latest/aggregations/
 // https://opensearch.org/docs/latest/aggregations/bucket/terms/
-
-func (s OpenSearchSpelunker) descendantsFacetedQuery(id int64, filters []spelunker.Filter, facets []*spelunker.Facet) string {
-	
-	str_aggs := s.facetsToAggregations(facets)
-	return fmt.Sprintf(`{"query": { "term": { "wof:belongsto":  %d  } }, "aggs": { %s } }`, id, str_aggs)
-}
 
 func (s OpenSearchSpelunker) searchQuery(search_opts *spelunker.SearchOptions) string {
 
@@ -89,4 +106,23 @@ func (s OpenSearchSpelunker) facetsToAggregations(facets []*spelunker.Facet) str
 	}
 
 	return strings.Join(aggs, ",")	
+}
+
+func (s OpenSearchSpelunker) mustQueryWithFiltersCriteria(must []string, filters []spelunker.Filter) string {
+
+	for _, f := range filters {
+
+		switch f.Scheme() {
+		case "placetype":
+			must = append(must, fmt.Sprintf(`{ "term": { "wof:placetype": "%s" } }`, f.Value()))
+		case "country":
+			must = append(must, fmt.Sprintf(`{ "term": { "wof:country": "%s" } }`, f.Value()))			
+		default:
+			slog.Warn("Unsupported filter scheme", "scheme", f.Scheme())
+		}
+	}
+	
+	str_must := strings.Join(must, ",")
+	
+	return fmt.Sprintf(`{ "bool": { "must": [ %s ] } }`, str_must)	
 }
