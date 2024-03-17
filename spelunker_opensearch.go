@@ -276,8 +276,8 @@ func (s *OpenSearchSpelunker) searchWithIndex(ctx context.Context, req *opensear
 
 	if rsp.StatusCode != 200 {
 
-		// body, _ := io.ReadAll(rsp.Body)
-		// slog.Error(string(body))
+		body, _ := io.ReadAll(rsp.Body)
+		slog.Error(string(body))
 
 		slog.Error("Query failed", "status", rsp.StatusCode)
 		return nil, fmt.Errorf("Invalid status")

@@ -3,7 +3,8 @@ package opensearch
 import (
 	"fmt"
 	"strings"
-
+	"log/slog"
+	
 	"github.com/whosonfirst/go-whosonfirst-spelunker"
 )
 
@@ -18,7 +19,30 @@ func (s OpenSearchSpelunker) idQuery(id int64) string {
 }
 
 func (s OpenSearchSpelunker) descendantsQuery(id int64, filters []spelunker.Filter) string {
-	return fmt.Sprintf(`{"query": { "term": { "wof:belongsto":  %d  } } }`, id)
+
+	if len(filters) == 0 {
+		return fmt.Sprintf(`{"query": { "term": { "wof:belongsto":  %d  } } }`, id)
+	}
+
+	must := []string{
+		fmt.Sprintf(`{ "term": { "wof:belongsto":  %d  } } `, id),
+	}
+
+	for _, f := range filters {
+
+		switch f.Scheme() {
+		case "placetype":
+			must = append(must, fmt.Sprintf(`{ "term": { "wof:placetype": "%s" } }`, f.Value()))
+		case "country":
+			must = append(must, fmt.Sprintf(`{ "term": { "wof:country": "%s" } }`, f.Value()))			
+		default:
+			slog.Warn("Unsupported filter scheme", "scheme", f.Scheme())
+		}
+	}
+	
+	str_must := strings.Join(must, ",")
+	
+	return fmt.Sprintf(`{"query": { "bool": { "must": [ %s ] } } }`, str_must)
 }
 
 func (s OpenSearchSpelunker) hasPlacetypesQuery(pt string, filters []spelunker.Filter) string {
