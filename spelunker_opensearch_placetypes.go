@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
-
+	
 	"github.com/aaronland/go-pagination"
 	opensearchapi "github.com/opensearch-project/opensearch-go/v2/opensearchapi"
 	"github.com/whosonfirst/go-whosonfirst-placetypes"

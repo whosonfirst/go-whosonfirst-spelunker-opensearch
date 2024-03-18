@@ -29,7 +29,7 @@ func (s OpenSearchSpelunker) descendantsFacetedQuery(id int64, filters []spelunk
 	q := s.descendantsQueryCriteria(id, filters)
 	str_aggs := s.facetsToAggregations(facets)
 	
-	return fmt.Sprintf(`{"query": %s }, "aggs": { %s } }`, q, str_aggs)
+	return fmt.Sprintf(`{"query": %s, "aggs": { %s } }`, q, str_aggs)
 }
 
 func (s OpenSearchSpelunker) descendantsQueryCriteria(id int64, filters []spelunker.Filter) string {
@@ -59,7 +59,7 @@ func (s OpenSearchSpelunker) hasPlacetypeFacetedQuery(pt string, filters []spelu
 	q := s.hasPlacetypeQueryCriteria(pt, filters)
 	str_aggs := s.facetsToAggregations(facets)
 	
-	return fmt.Sprintf(`{"query": %s }, "aggs": { %s } }`, q, str_aggs)
+	return fmt.Sprintf(`{"query": %s, "aggs": { %s } }`, q, str_aggs)
 }
 
 func (s OpenSearchSpelunker) hasPlacetypeQueryCriteria(pt string, filters []spelunker.Filter) string {
