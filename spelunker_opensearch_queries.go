@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"strings"
 	"log/slog"
+	"time"
 	
 	"github.com/whosonfirst/go-whosonfirst-spelunker"
 )
@@ -75,6 +76,26 @@ func (s OpenSearchSpelunker) hasPlacetypeQueryCriteria(pt string, filters []spel
 	}
 
 	return s.mustQueryWithFiltersCriteria(must, filters)	
+}
+
+func (s OpenSearchSpelunker) getRecentQueryCriteria(d time.Duration, filters []spelunker.Filter) string {
+
+	now := time.Now()
+	ts := now.Unix()
+
+	then := ts - int64(d.Seconds())
+	
+	q := fmt.Sprintf(`{ "range": { "wof:lastmodified": { "gte": %d  } } }`, then)
+
+	if len(filters) == 0 {
+		return q
+	}
+
+	must := []string{
+		q,
+	}
+
+	return s.mustQueryWithFiltersCriteria(must, filters)		
 }
 
 func (s OpenSearchSpelunker) matchAllFacetedQuery(facets []*spelunker.Facet) string {

@@ -22,23 +22,6 @@ import (
 	"github.com/whosonfirst/go-whosonfirst-uri"
 )
 
-/*
-
-2024/03/14 09:16:16 INFO COUNT count=10000 error=<nil>
-2024/03/14 09:16:16 INFO USE SCROLL
-2024/03/14 09:16:16 INFO to spr count=62259 scroll=FGluY2x1ZGVfY29udGV4dF91dWlkDXF1ZXJ5QW5kRmV0Y2gBFjM1S0daQlBOUUV1dnphRHkxT0VoQ2cAAAAAAAAAwBZuYzhqaWtTdFNGU2pEN3ZLWWZ5R2tn
-fatal error: concurrent map read and map write
-
-goroutine 934 [running]:
-github.com/aaronland/go-http-server/handler.deriveHandler(0x0?, 0xc0004dcb10, 0xc0004de600, {0xc000130600?, 0xc0005e1a80?, 0x64b5af8?})
-	/Users/asc/go/pkg/mod/github.com/aaronland/go-http-server@v1.4.0/handler/route.go:213 +0x33d
-github.com/aaronland/go-http-server/handler.RouteHandlerWithOptions.func2({0x70cf9a0, 0xc00051c7e0}, 0xc000504480)
-	/Users/asc/go/pkg/mod/github.com/aaronland/go-http-server@v1.4.0/handler/route.go:109 +0x5c
-net/http.HandlerFunc.ServeHTTP(0xc0005ad2b0?, {0x70cf9a0?, 0xc00051c7e0?}, 0x67aef3a?)
-	/usr/local/go/src/net/http/server.go:2166 +0x29
-
-*/
-
 const scroll_duration time.Duration = 5 * time.Minute
 const scroll_trigger int64 = 10000
 
