@@ -103,7 +103,8 @@ func (s *OpenSearchSpelunker) Search(ctx context.Context, pg_opts pagination.Opt
 
 func (s *OpenSearchSpelunker) GetRecent(ctx context.Context, pg_opts pagination.Options, d time.Duration, filters []spelunker.Filter) (wof_spr.StandardPlacesResults, pagination.Results, error) {
 
-	return nil, nil, spelunker.ErrNotImplemented
+	q := s.getRecentQuery(d, filters)
+	return s.searchPaginated(ctx, pg_opts, q)
 }
 
 func (s *OpenSearchSpelunker) facet(ctx context.Context, req *opensearchapi.SearchRequest, facets []*spelunker.Facet) ([]*spelunker.Faceting, error) {

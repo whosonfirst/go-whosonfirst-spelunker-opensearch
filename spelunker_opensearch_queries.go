@@ -78,6 +78,20 @@ func (s OpenSearchSpelunker) hasPlacetypeQueryCriteria(pt string, filters []spel
 	return s.mustQueryWithFiltersCriteria(must, filters)	
 }
 
+func (s OpenSearchSpelunker) getRecentQuery(d time.Duration, filters []spelunker.Filter) string {
+	
+	q := s.getRecentQueryCriteria(d, filters)
+	return fmt.Sprintf(`{"query": %s }`, q )
+}
+
+func (s OpenSearchSpelunker) getRecentFacetedQuery(d time.Duration, filters []spelunker.Filter, facets []*spelunker.Facet) string {
+	
+	q := s.getRecentQueryCriteria(d, filters)
+	str_aggs := s.facetsToAggregations(facets)
+	
+	return fmt.Sprintf(`{"query": %s, "aggs": { %s } }`, q, str_aggs)
+}
+
 func (s OpenSearchSpelunker) getRecentQueryCriteria(d time.Duration, filters []spelunker.Filter) string {
 
 	now := time.Now()
