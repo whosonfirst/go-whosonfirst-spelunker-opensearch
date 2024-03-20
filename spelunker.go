@@ -101,25 +101,6 @@ func (s *OpenSearchSpelunker) Search(ctx context.Context, pg_opts pagination.Opt
 	return s.searchPaginated(ctx, pg_opts, q)
 }
 
-func (s *OpenSearchSpelunker) GetRecent(ctx context.Context, pg_opts pagination.Options, d time.Duration, filters []spelunker.Filter) (wof_spr.StandardPlacesResults, pagination.Results, error) {
-
-	q := s.getRecentQuery(d, filters)
-	return s.searchPaginated(ctx, pg_opts, q)
-}
-
-func (s *OpenSearchSpelunker) GetRecentFaceted(ctx context.Context, d time.Duration, filters []spelunker.Filter, facets []*spelunker.Facet) ([]*spelunker.Faceting, error) {
-
-	q := s.getRecentFacetedQuery(d, filters, facets)
-	sz := 0
-
-	req := &opensearchapi.SearchRequest{
-		Body: strings.NewReader(q),
-		Size: &sz,
-	}
-
-	return s.facet(ctx, req, facets)	
-}
-
 func (s *OpenSearchSpelunker) facet(ctx context.Context, req *opensearchapi.SearchRequest, facets []*spelunker.Facet) ([]*spelunker.Faceting, error) {
 
 	body, err := s.searchWithIndex(ctx, req)

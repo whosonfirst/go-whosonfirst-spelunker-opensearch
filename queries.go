@@ -78,6 +78,61 @@ func (s OpenSearchSpelunker) hasPlacetypeQueryCriteria(pt string, filters []spel
 	return s.mustQueryWithFiltersCriteria(must, filters)	
 }
 
+func (s OpenSearchSpelunker) hasConcordanceQuery(namespace string, predicate string, value any, filters []spelunker.Filter) string {
+
+	q := s.hasConcordanceQueryCriteria(namespace, predicate, value, filters)
+	return fmt.Sprintf(`{"query": %s }`, q)		
+}
+
+func (s OpenSearchSpelunker) hasConcordanceFacetedQuery(namespace string, predicate string, value any, filters []spelunker.Filter, facets []*spelunker.Facet) string {
+
+	q := s.hasConcordanceQueryCriteria(namespace, predicate, value, filters)
+	str_aggs := s.facetsToAggregations(facets)
+	
+	return fmt.Sprintf(`{"query": %s, "aggs": { %s } }`, q, str_aggs)
+}
+
+func (s OpenSearchSpelunker) hasConcordanceQueryCriteria(namespace string, predicate string, value any, filters []spelunker.Filter) string {
+
+	var q string
+
+	str_value := fmt.Sprintf("%v", value)
+	
+	slog.Info("Concordance", "namespace", namespace, "predicate", predicate, "value", value)
+	
+	switch {
+	case namespace != "" && predicate != "" && str_value != "":
+		q = fmt.Sprintf(`{ "term": { "wof:concordances.%s:%s":  "%s"  } }`, namespace, predicate, str_value)
+	case namespace != "" && predicate != "":
+		q = fmt.Sprintf(`{ "term": { "wof:concordances_sources":  "%s:%s"  } }`, namespace, predicate)
+	case namespace != "":
+		q = fmt.Sprintf(`{ "prefix": { "wof:concordances_sources":  { "value": "%s", "case_insensitive": true }  } }`, namespace)		
+	case predicate != "" && str_value != "":
+		// 
+	case predicate != "":
+		q = fmt.Sprintf(`{ "wildcard": { "wof:concordances_sources":  { "value": "*:%s", "case_insensitive": true }  } }`, predicate)						
+	case namespace != "" && str_value != "":
+		// 
+	case value != nil:
+		//
+	default:
+		
+	}
+
+	slog.Info(q)
+	
+	if len(filters) == 0 {
+		return q
+	}
+
+	must := []string{
+		q,
+	}
+
+	return s.mustQueryWithFiltersCriteria(must, filters)	
+}
+
+
 func (s OpenSearchSpelunker) getRecentQuery(d time.Duration, filters []spelunker.Filter) string {
 	
 	q := s.getRecentQueryCriteria(d, filters)
