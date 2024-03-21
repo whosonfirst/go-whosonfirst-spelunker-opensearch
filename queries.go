@@ -11,21 +11,21 @@ import (
 
 // Something something something do all of this with templates...
 
-func (s OpenSearchSpelunker) matchAllQuery() string {
+func (s *OpenSearchSpelunker) matchAllQuery() string {
 	return `{"query": { "match_all": {} }}`
 }
 
-func (s OpenSearchSpelunker) idQuery(id int64) string {
+func (s *OpenSearchSpelunker) idQuery(id int64) string {
 	return fmt.Sprintf(`{"query": { "ids": { "values": [ %d ] } } }`, id)
 }
 
-func (s OpenSearchSpelunker) descendantsQuery(id int64, filters []spelunker.Filter) string {
+func (s *OpenSearchSpelunker) descendantsQuery(id int64, filters []spelunker.Filter) string {
 
 	q := s.descendantsQueryCriteria(id, filters)
 	return fmt.Sprintf(`{"query": %s }`, q)
 }
 
-func (s OpenSearchSpelunker) descendantsFacetedQuery(id int64, filters []spelunker.Filter, facets []*spelunker.Facet) string {
+func (s *OpenSearchSpelunker) descendantsFacetedQuery(id int64, filters []spelunker.Filter, facets []*spelunker.Facet) string {
 
 	q := s.descendantsQueryCriteria(id, filters)
 	str_aggs := s.facetsToAggregations(facets)
@@ -33,7 +33,7 @@ func (s OpenSearchSpelunker) descendantsFacetedQuery(id int64, filters []spelunk
 	return fmt.Sprintf(`{"query": %s, "aggs": { %s } }`, q, str_aggs)
 }
 
-func (s OpenSearchSpelunker) descendantsQueryCriteria(id int64, filters []spelunker.Filter) string {
+func (s *OpenSearchSpelunker) descendantsQueryCriteria(id int64, filters []spelunker.Filter) string {
 
 	q := fmt.Sprintf(`{ "term": { "wof:belongsto":  %d  } }`, id)
 	
@@ -49,13 +49,13 @@ func (s OpenSearchSpelunker) descendantsQueryCriteria(id int64, filters []spelun
 	return fmt.Sprintf(`{"query": %s }`, q)	
 }
 
-func (s OpenSearchSpelunker) hasPlacetypeQuery(pt string, filters []spelunker.Filter) string {
+func (s *OpenSearchSpelunker) hasPlacetypeQuery(pt string, filters []spelunker.Filter) string {
 
 	q := s.hasPlacetypeQueryCriteria(pt, filters)
 	return fmt.Sprintf(`{"query": %s }`, q)		
 }
 
-func (s OpenSearchSpelunker) hasPlacetypeFacetedQuery(pt string, filters []spelunker.Filter, facets []*spelunker.Facet) string {
+func (s *OpenSearchSpelunker) hasPlacetypeFacetedQuery(pt string, filters []spelunker.Filter, facets []*spelunker.Facet) string {
 
 	q := s.hasPlacetypeQueryCriteria(pt, filters)
 	str_aggs := s.facetsToAggregations(facets)
@@ -63,7 +63,7 @@ func (s OpenSearchSpelunker) hasPlacetypeFacetedQuery(pt string, filters []spelu
 	return fmt.Sprintf(`{"query": %s, "aggs": { %s } }`, q, str_aggs)
 }
 
-func (s OpenSearchSpelunker) hasPlacetypeQueryCriteria(pt string, filters []spelunker.Filter) string {
+func (s *OpenSearchSpelunker) hasPlacetypeQueryCriteria(pt string, filters []spelunker.Filter) string {
 
 	q := fmt.Sprintf(`{ "term": { "wof:placetype":  "%s"  } }`, pt)
 	
@@ -78,13 +78,13 @@ func (s OpenSearchSpelunker) hasPlacetypeQueryCriteria(pt string, filters []spel
 	return s.mustQueryWithFiltersCriteria(must, filters)	
 }
 
-func (s OpenSearchSpelunker) hasConcordanceQuery(namespace string, predicate string, value any, filters []spelunker.Filter) string {
+func (s *OpenSearchSpelunker) hasConcordanceQuery(namespace string, predicate string, value any, filters []spelunker.Filter) string {
 
 	q := s.hasConcordanceQueryCriteria(namespace, predicate, value, filters)
 	return fmt.Sprintf(`{"query": %s }`, q)		
 }
 
-func (s OpenSearchSpelunker) hasConcordanceFacetedQuery(namespace string, predicate string, value any, filters []spelunker.Filter, facets []*spelunker.Facet) string {
+func (s *OpenSearchSpelunker) hasConcordanceFacetedQuery(namespace string, predicate string, value any, filters []spelunker.Filter, facets []*spelunker.Facet) string {
 
 	q := s.hasConcordanceQueryCriteria(namespace, predicate, value, filters)
 	str_aggs := s.facetsToAggregations(facets)
@@ -92,7 +92,7 @@ func (s OpenSearchSpelunker) hasConcordanceFacetedQuery(namespace string, predic
 	return fmt.Sprintf(`{"query": %s, "aggs": { %s } }`, q, str_aggs)
 }
 
-func (s OpenSearchSpelunker) hasConcordanceQueryCriteria(namespace string, predicate string, value any, filters []spelunker.Filter) string {
+func (s *OpenSearchSpelunker) hasConcordanceQueryCriteria(namespace string, predicate string, value any, filters []spelunker.Filter) string {
 
 	var q string
 
@@ -134,13 +134,13 @@ func (s OpenSearchSpelunker) hasConcordanceQueryCriteria(namespace string, predi
 }
 
 
-func (s OpenSearchSpelunker) getRecentQuery(d time.Duration, filters []spelunker.Filter) string {
+func (s *OpenSearchSpelunker) getRecentQuery(d time.Duration, filters []spelunker.Filter) string {
 	
 	q := s.getRecentQueryCriteria(d, filters)
 	return fmt.Sprintf(`{"query": %s }`, q )
 }
 
-func (s OpenSearchSpelunker) getRecentFacetedQuery(d time.Duration, filters []spelunker.Filter, facets []*spelunker.Facet) string {
+func (s *OpenSearchSpelunker) getRecentFacetedQuery(d time.Duration, filters []spelunker.Filter, facets []*spelunker.Facet) string {
 	
 	q := s.getRecentQueryCriteria(d, filters)
 	str_aggs := s.facetsToAggregations(facets)
@@ -148,7 +148,7 @@ func (s OpenSearchSpelunker) getRecentFacetedQuery(d time.Duration, filters []sp
 	return fmt.Sprintf(`{"query": %s, "aggs": { %s } }`, q, str_aggs)
 }
 
-func (s OpenSearchSpelunker) getRecentQueryCriteria(d time.Duration, filters []spelunker.Filter) string {
+func (s *OpenSearchSpelunker) getRecentQueryCriteria(d time.Duration, filters []spelunker.Filter) string {
 
 	now := time.Now()
 	ts := now.Unix()
@@ -168,7 +168,7 @@ func (s OpenSearchSpelunker) getRecentQueryCriteria(d time.Duration, filters []s
 	return s.mustQueryWithFiltersCriteria(must, filters)		
 }
 
-func (s OpenSearchSpelunker) matchAllFacetedQuery(facets []*spelunker.Facet) string {
+func (s *OpenSearchSpelunker) matchAllFacetedQuery(facets []*spelunker.Facet) string {
 
 	str_aggs := s.facetsToAggregations(facets)
 	return fmt.Sprintf(`{"query": { "match_all": {} }, "aggs": { %s } }`, str_aggs)
@@ -178,12 +178,37 @@ func (s OpenSearchSpelunker) matchAllFacetedQuery(facets []*spelunker.Facet) str
 // https://opensearch.org/docs/latest/aggregations/
 // https://opensearch.org/docs/latest/aggregations/bucket/terms/
 
-func (s OpenSearchSpelunker) searchQuery(search_opts *spelunker.SearchOptions) string {
+func (s *OpenSearchSpelunker) searchQuery(search_opts *spelunker.SearchOptions, filters []spelunker.Filter) string {
 
-	return fmt.Sprintf(`{"query": { "term": { "names_all": "%s" } } }`, search_opts.Query)
+	q := s.searchQueryCriteria(search_opts, filters)
+	return fmt.Sprintf(`{"query": %s  }`, q)
+}
+         
+func (s *OpenSearchSpelunker) searchFacetedQuery(search_opts *spelunker.SearchOptions, filters []spelunker.Filter, facets []*spelunker.Facet) string {
+
+	q := s.searchQueryCriteria(search_opts, filters)
+	str_aggs := s.facetsToAggregations(facets)
+	
+	return fmt.Sprintf(`{"query": %s, "aggs": { %s } }`, q, str_aggs)	
 }
 
-func (s OpenSearchSpelunker) facetsToAggregations(facets []*spelunker.Facet) string {
+func (s *OpenSearchSpelunker) searchQueryCriteria(search_opts *spelunker.SearchOptions, filters []spelunker.Filter) string {
+
+	q := fmt.Sprintf(`{ "term": { "names_all": "%s" } }`, search_opts.Query)
+
+	if len(filters) == 0 {
+		return q
+	}
+
+	must := []string{
+		q,
+	}
+
+	return s.mustQueryWithFiltersCriteria(must, filters)
+	return fmt.Sprintf(`{"query": %s }`, q)	
+}
+		
+func (s *OpenSearchSpelunker) facetsToAggregations(facets []*spelunker.Facet) string {
 
 	count_facets := len(facets)
 	aggs := make([]string, count_facets)
@@ -199,7 +224,7 @@ func (s OpenSearchSpelunker) facetsToAggregations(facets []*spelunker.Facet) str
 	return strings.Join(aggs, ",")	
 }
 
-func (s OpenSearchSpelunker) mustQueryWithFiltersCriteria(must []string, filters []spelunker.Filter) string {
+func (s *OpenSearchSpelunker) mustQueryWithFiltersCriteria(must []string, filters []spelunker.Filter) string {
 
 	for _, f := range filters {
 

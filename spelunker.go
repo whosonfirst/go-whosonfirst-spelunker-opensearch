@@ -95,12 +95,6 @@ func (s *OpenSearchSpelunker) GetAlternateGeometryById(ctx context.Context, id i
 	return nil, spelunker.ErrNotImplemented
 }
 
-func (s *OpenSearchSpelunker) Search(ctx context.Context, pg_opts pagination.Options, search_opts *spelunker.SearchOptions) (wof_spr.StandardPlacesResults, pagination.Results, error) {
-
-	q := s.searchQuery(search_opts)
-	return s.searchPaginated(ctx, pg_opts, q)
-}
-
 func (s *OpenSearchSpelunker) facet(ctx context.Context, req *opensearchapi.SearchRequest, facets []*spelunker.Facet) ([]*spelunker.Faceting, error) {
 
 	body, err := s.searchWithIndex(ctx, req)

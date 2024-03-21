@@ -46,5 +46,13 @@ func (s *OpenSearchSpelunker) HasConcordance(ctx context.Context, pg_opts pagina
 
 func (s *OpenSearchSpelunker) HasConcordanceFaceted(ctx context.Context, namespace string, predicate string, value any, filters []spelunker.Filter, facets []*spelunker.Facet) ([]*spelunker.Faceting, error) {
 
-	return nil, spelunker.ErrNotImplemented
+	q := s.hasConcordanceFacetedQuery(namespace, predicate, value, filters, facets)
+	sz := 0
+
+	req := &opensearchapi.SearchRequest{
+		Body: strings.NewReader(q),
+		Size: &sz,
+	}
+
+	return s.facet(ctx, req, facets)	
 }
