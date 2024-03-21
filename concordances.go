@@ -13,7 +13,7 @@ import (
 
 func (s *OpenSearchSpelunker) GetConcordances(ctx context.Context) (*spelunker.Faceting, error) {
 
-	c_facet := spelunker.NewFacet("concordances_sources")
+	c_facet := spelunker.NewFacet("concordances_sources.keyword")
 
 	facets := []*spelunker.Facet{
 		c_facet,

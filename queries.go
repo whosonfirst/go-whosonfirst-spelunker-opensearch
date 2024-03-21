@@ -105,16 +105,16 @@ func (s OpenSearchSpelunker) hasConcordanceQueryCriteria(namespace string, predi
 		q = fmt.Sprintf(`{ "term": { "wof:concordances.%s:%s":  { "value": "%s", "case_insensitive": true } } }`, namespace, predicate, str_value)
 	case namespace != "" && predicate != "":
 		q = fmt.Sprintf(`{ "wildcard": { "wof:concordances_machinetags.keyword":  { "value": "%s:%s=*", "case_insensitive": true }  } }`, namespace, predicate)
-	case namespace != "":
-		q = fmt.Sprintf(`{ "prefix": { "wof:concordances_sources":  { "value": "%s", "case_insensitive": true }  } }`, namespace)		
 	case predicate != "" && str_value != "":
-		q = fmt.Sprintf(`{ "wildcard": { "wof:concordances_machinetags":  { "value": "*:%s=%s", "case_insensitive": true }  } }`, predicate, value)
-	case predicate != "":
-		q = fmt.Sprintf(`{ "wildcard": { "wof:concordances_machinetags":  { "value": "*:%s", "case_insensitive": true }  } }`, predicate)
+		q = fmt.Sprintf(`{ "wildcard": { "wof:concordances_machinetags.keyword":  { "value": "*:%s=%s", "case_insensitive": true }  } }`, predicate, value)
 	case namespace != "" && str_value != "":
-		q = fmt.Sprintf(`{ "wildcard": { "wof:concordances_machinetags":  { "value": "%s:*=%s", "case_insensitive": true }  } }`, namespace, value)		
+		q = fmt.Sprintf(`{ "wildcard": { "wof:concordances_machinetags.keyword":  { "value": "%s:*=%s", "case_insensitive": true }  } }`, namespace, value)
+	case namespace != "":
+		q = fmt.Sprintf(`{ "prefix": { "wof:concordances_machinetags.keyword":  { "value": "%s:*", "case_insensitive": true }  } }`, namespace)		
+	case predicate != "":
+		q = fmt.Sprintf(`{ "wildcard": { "wof:concordances_machinetags.keyword":  { "value": "*:%s", "case_insensitive": true }  } }`, predicate)		
 	case value != nil:
-		q = fmt.Sprintf(`{ "wildcard": { "wof:concordances_machinetags":  { "value": "*:*=%s", "case_insensitive": true }  } }`, value)		
+		q = fmt.Sprintf(`{ "wildcard": { "wof:concordances_machinetags.keyword":  { "value": "*:*=%s", "case_insensitive": true }  } }`, value)		
 	default:
 		
 	}
