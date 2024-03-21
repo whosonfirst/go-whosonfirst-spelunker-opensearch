@@ -104,24 +104,23 @@ func (s OpenSearchSpelunker) hasConcordanceQueryCriteria(namespace string, predi
 	case namespace != "" && predicate != "" && str_value != "":
 		q = fmt.Sprintf(`{ "term": { "wof:concordances.%s:%s":  { "value": "%s", "case_insensitive": true } } }`, namespace, predicate, str_value)
 	case namespace != "" && predicate != "":
-		// This does not work because we are not tracking concordances_sources
-		q = fmt.Sprintf(`{ "term": { "wof:concordances_sources":  { "value": "%s:%s", "case_insensitive": true }  } }`, namespace, predicate)
+		q = fmt.Sprintf(`{ "wildcard": { "wof:concordances_machinetags.keyword":  { "value": "%s:%s=*", "case_insensitive": true }  } }`, namespace, predicate)
 	case namespace != "":
 		q = fmt.Sprintf(`{ "prefix": { "wof:concordances_sources":  { "value": "%s", "case_insensitive": true }  } }`, namespace)		
 	case predicate != "" && str_value != "":
-		// 
+		q = fmt.Sprintf(`{ "wildcard": { "wof:concordances_machinetags":  { "value": "*:%s=%s", "case_insensitive": true }  } }`, predicate, value)
 	case predicate != "":
-		q = fmt.Sprintf(`{ "wildcard": { "wof:concordances_sources":  { "value": "*:%s", "case_insensitive": true }  } }`, predicate)						
+		q = fmt.Sprintf(`{ "wildcard": { "wof:concordances_machinetags":  { "value": "*:%s", "case_insensitive": true }  } }`, predicate)
 	case namespace != "" && str_value != "":
-		// 
+		q = fmt.Sprintf(`{ "wildcard": { "wof:concordances_machinetags":  { "value": "%s:*=%s", "case_insensitive": true }  } }`, namespace, value)		
 	case value != nil:
-		//
+		q = fmt.Sprintf(`{ "wildcard": { "wof:concordances_machinetags":  { "value": "*:*=%s", "case_insensitive": true }  } }`, value)		
 	default:
 		
 	}
 
-	// slog.Info("Concordance", "namespace", namespace, "predicate", predicate, "value", value)
-	// slog.Info(q)
+	slog.Info("Concordance", "namespace", namespace, "predicate", predicate, "value", value)
+	slog.Info(q)
 	
 	if len(filters) == 0 {
 		return q
