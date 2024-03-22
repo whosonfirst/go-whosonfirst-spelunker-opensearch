@@ -188,7 +188,8 @@ func (s *OpenSearchSpelunker) searchFacetedQuery(search_opts *spelunker.SearchOp
 
 	q := s.searchQueryCriteria(search_opts, filters)
 	str_aggs := s.facetsToAggregations(facets)
-	
+
+	slog.Info(str_aggs)
 	return fmt.Sprintf(`{"query": %s, "aggs": { %s } }`, q, str_aggs)	
 }
 
@@ -215,9 +216,15 @@ func (s *OpenSearchSpelunker) facetsToAggregations(facets []*spelunker.Facet) st
 
 	for i, f := range facets {
 
-		// This will probably need to be done in a switch statement eventually...
-		facet_field := fmt.Sprintf("wof:%s", f)
+		var facet_field string
 
+		switch f.String() {
+		case "is_current":
+			facet_field = fmt.Sprintf("mz:%s", f)
+		default:
+			facet_field = fmt.Sprintf("wof:%s", f)			
+		}
+		
 		aggs[i] = fmt.Sprintf(`"%s": { "terms": { "field": "%s", "size": 1000 } }`, f, facet_field)
 	}
 
@@ -232,13 +239,15 @@ func (s *OpenSearchSpelunker) mustQueryWithFiltersCriteria(must []string, filter
 		case "placetype":
 			must = append(must, fmt.Sprintf(`{ "term": { "wof:placetype": "%s" } }`, f.Value()))
 		case "country":
-			must = append(must, fmt.Sprintf(`{ "term": { "wof:country": "%s" } }`, f.Value()))			
+			must = append(must, fmt.Sprintf(`{ "term": { "wof:country": "%s" } }`, f.Value()))
+		case "is_current":
+			must = append(must, fmt.Sprintf(`{ "term": { "mz:is_current": "%s" } }`, f.Value()))						
 		default:
 			slog.Warn("Unsupported filter scheme", "scheme", f.Scheme())
 		}
 	}
 	
 	str_must := strings.Join(must, ",")
-	
+
 	return fmt.Sprintf(`{ "bool": { "must": [ %s ] } }`, str_must)	
 }
