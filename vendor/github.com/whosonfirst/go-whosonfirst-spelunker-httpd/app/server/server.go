@@ -55,22 +55,31 @@ func RunWithOptions(ctx context.Context, opts *RunOptions, logger *slog.Logger) 
 		run_options.URIs.Concordances:           concordancesHandlerFunc,
 		run_options.URIs.ConcordanceNS:          hasConcordanceHandlerFunc,
 		run_options.URIs.ConcordanceNSPred:      hasConcordanceHandlerFunc,
-		run_options.URIs.ConcordanceNSPredValue: hasConcordanceHandlerFunc,
+		run_options.URIs.ConcordanceTriple: hasConcordanceHandlerFunc,
 		run_options.URIs.Recent:                 recentHandlerFunc,
+		run_options.URIs.NullIsland:                 nullIslandHandlerFunc,		
 		run_options.URIs.Descendants:            descendantsHandlerFunc,
 		run_options.URIs.Id:                     idHandlerFunc,
 		run_options.URIs.Search:                 searchHandlerFunc,
 		run_options.URIs.About:                  aboutHandlerFunc,
+		run_options.URIs.Code:                  codeHandlerFunc,		
 		run_options.URIs.Index:                  indexHandlerFunc,
 
 		// Static assets
 		run_options.URIs.Static: staticHandlerFunc,
 
 		// API/machine-readable
+		run_options.URIs.ConcordanceNSFaceted: hasConcordanceFacetedHandlerFunc,
+		run_options.URIs.ConcordanceNSPredFaceted: hasConcordanceFacetedHandlerFunc,
+		run_options.URIs.ConcordanceTripleFaceted: hasConcordanceFacetedHandlerFunc,				
 		run_options.URIs.DescendantsFaceted: descendantsFacetedHandlerFunc,
 		run_options.URIs.GeoJSON:            geoJSONHandlerFunc,
 		run_options.URIs.GeoJSONLD:          geoJSONLDHandlerFunc,
 		run_options.URIs.NavPlace:           navPlaceHandlerFunc,
+		run_options.URIs.NullIslandFaceted:      nullIslandFacetedHandlerFunc,		
+		run_options.URIs.PlacetypeFaceted:   placetypeFacetedHandlerFunc,
+		run_options.URIs.RecentFaceted:      recentFacetedHandlerFunc,
+		run_options.URIs.SearchFaceted:      searchFacetedHandlerFunc,		
 		run_options.URIs.Select:             selectHandlerFunc,
 		run_options.URIs.SPR:                sprHandlerFunc,
 		run_options.URIs.SVG:                svgHandlerFunc,
@@ -91,6 +100,7 @@ func RunWithOptions(ctx context.Context, opts *RunOptions, logger *slog.Logger) 
 	assign_handlers(handlers, run_options.URIs.GeoJSONLDAlt, geoJSONLDHandlerFunc)
 	assign_handlers(handlers, run_options.URIs.NavPlaceAlt, navPlaceHandlerFunc)
 	assign_handlers(handlers, run_options.URIs.SelectAlt, selectHandlerFunc)
+	assign_handlers(handlers, run_options.URIs.RecentAlt, recentHandlerFunc)
 	assign_handlers(handlers, run_options.URIs.SPRAlt, sprHandlerFunc)
 	assign_handlers(handlers, run_options.URIs.SVGAlt, svgHandlerFunc)
 

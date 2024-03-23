@@ -64,6 +64,7 @@ func IdHandler(opts *IdHandlerOptions) (http.Handler, error) {
 		logger := slog.Default()
 		logger = logger.With("request", req.URL)
 
+		logger.Info("1")
 		req_uri, err, status := httpd.ParseURIFromRequest(req, nil)
 
 		if err != nil {
@@ -74,6 +75,8 @@ func IdHandler(opts *IdHandlerOptions) (http.Handler, error) {
 
 		wof_id := req_uri.Id
 
+		logger.Info("2")
+
 		req_id, err := uri.Id2Fname(req_uri.Id, req_uri.URIArgs)
 
 		if err != nil {
@@ -81,6 +84,8 @@ func IdHandler(opts *IdHandlerOptions) (http.Handler, error) {
 			http.Error(rsp, spelunker.ErrNotFound.Error(), http.StatusNotFound)
 			return
 		}
+
+		logger.Info("3")
 
 		req_id = strings.Replace(req_id, filepath.Ext(req_id), "", 1)
 
@@ -121,6 +126,8 @@ func IdHandler(opts *IdHandlerOptions) (http.Handler, error) {
 			RelPath:    rel_path,
 		}
 
+		logger.Info("4")
+
 		if req_uri.IsAlternate {
 
 			rsp.Header().Set("Content-Type", "text/html")
@@ -135,6 +142,8 @@ func IdHandler(opts *IdHandlerOptions) (http.Handler, error) {
 			return
 		}
 
+		logger.Info("5")
+
 		count_descendants, err := opts.Spelunker.CountDescendants(ctx, wof_id)
 
 		if err != nil {
@@ -142,6 +151,8 @@ func IdHandler(opts *IdHandlerOptions) (http.Handler, error) {
 			http.Error(rsp, "Internal server error", http.StatusInternalServerError)
 			return
 		}
+
+		logger.Info("6")
 
 		// START OF there's got to be a better way to do this...
 
@@ -171,6 +182,8 @@ func IdHandler(opts *IdHandlerOptions) (http.Handler, error) {
 			sorted = append(sorted, n.String())
 		}
 
+		logger.Info("7")
+
 		hierarchies := properties.Hierarchies(f)
 
 		handler_hierarchies := make([][]*IdHandlerAncestor, len(hierarchies))
@@ -198,6 +211,8 @@ func IdHandler(opts *IdHandlerOptions) (http.Handler, error) {
 
 			handler_hierarchies[idx] = handler_ancestors
 		}
+
+		logger.Info("8")
 
 		// END OF there's got to be a better way to do this...
 

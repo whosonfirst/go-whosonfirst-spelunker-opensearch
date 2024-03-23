@@ -10,6 +10,9 @@ import (
 	"strings"
 
 	"github.com/aaronland/go-http-sanitize"
+	"github.com/aaronland/go-pagination"
+	"github.com/aaronland/go-pagination/countable"
+	"github.com/aaronland/go-pagination/cursor"
 	"github.com/whosonfirst/go-reader"
 	"github.com/whosonfirst/go-whosonfirst-spelunker"
 	"github.com/whosonfirst/go-whosonfirst-spelunker-httpd/webfinger"
@@ -125,6 +128,46 @@ func ParseURIFromPath(ctx context.Context, path string, r reader.Reader) (*URI, 
 	}
 
 	return parsed_uri, nil, 0
+}
+
+func PaginationOptionsFromRequest(req *go_http.Request) (pagination.Options, error) {
+
+	q_cursor, err := sanitize.GetString(req, "cursor")
+
+	if err != nil {
+		return nil, fmt.Errorf("Failed to derive ?cursor= parameter, %w", err)
+	}
+
+	if q_cursor != "" {
+
+		pg_opts, err := cursor.NewCursorOptions()
+
+		if err != nil {
+			return nil, fmt.Errorf("Failed to create cursor options, %w", err)
+		}
+
+		pg_opts.Pointer(q_cursor)
+		return pg_opts, nil
+	}
+
+	page, err := sanitize.GetInt64(req, "page")
+
+	if err != nil {
+		return nil, fmt.Errorf("Failed to derive ?page= parameter, %w", err)
+	}
+
+	if page == 0 {
+		page = 1
+	}
+
+	pg_opts, err := countable.NewCountableOptions()
+
+	if err != nil {
+		return nil, fmt.Errorf("Failed to create countable options, %w", err)
+	}
+
+	pg_opts.Pointer(page)
+	return pg_opts, nil
 }
 
 func ParsePageNumberFromRequest(req *go_http.Request) (int64, error) {

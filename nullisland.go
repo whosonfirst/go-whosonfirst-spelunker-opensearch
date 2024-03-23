@@ -3,8 +3,6 @@ package opensearch
 import (
 	"context"
 	"strings"
-
-	"log/slog"
 	
 	"github.com/aaronland/go-pagination"
 	opensearchapi "github.com/opensearch-project/opensearch-go/v2/opensearchapi"	
@@ -15,8 +13,6 @@ import (
 func (s *OpenSearchSpelunker) VisitingNullIsland(ctx context.Context, pg_opts pagination.Options, filters []spelunker.Filter) (wof_spr.StandardPlacesResults, pagination.Results, error) {
 
 	q := s.visitingNullIslandQuery(filters)
-
-	slog.Info(q)
 	return s.searchPaginated(ctx, pg_opts, q)
 }
 

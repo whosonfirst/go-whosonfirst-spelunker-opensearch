@@ -2,9 +2,12 @@ package httpd
 
 import (
 	"fmt"
+	"log/slog"
 	"net/url"
 	"reflect"
 	"strings"
+
+	"github.com/whosonfirst/go-whosonfirst-spelunker"
 )
 
 type URIs struct {
@@ -14,20 +17,26 @@ type URIs struct {
 	Concordances           string   `json:"concordances"`
 	ConcordanceNS          string   `json:"concordance_ns"`
 	ConcordanceNSPred      string   `json:"concordance_ns_pred"`
-	ConcordanceNSPredValue string   `json:"concordance_ns_pred_value"`
+	ConcordanceTriple string   `json:"concordance_triple"`
 	Descendants            string   `json:"descendants"`
 	DescendantsAlt         []string `json:"descendants_alt"`
 	Index                  string   `json:"index"`
 	Placetypes             string   `json:"placetypes"`
 	Placetype              string   `json:"placetype"`
+	NullIsland string `json:"nullisland"`
 	Recent                 string   `json:"recent"`
+	RecentAlt              []string `json:"recent_alt"`
 	Search                 string   `json:"search"`
 	About                  string   `json:"about"`
+	Code                  string   `json:"code"`	
 
 	// Static assets
 	Static string `json:"static"`
 
 	// API/machine-readable
+	ConcordanceNSFaceted string   `json:"concordance_ns"`
+	ConcordanceNSPredFaceted string   `json:"concordance_ns_pred"`		
+	ConcordanceTripleFaceted string   `json:"concordance_triple_faceted"`	
 	DescendantsFaceted string   `json:"descendants_faceted"`
 	GeoJSON            string   `json:"geojson"`
 	GeoJSONAlt         []string `json:"geojson_alt"`
@@ -35,6 +44,10 @@ type URIs struct {
 	GeoJSONLDAlt       []string `json:"geojsonld_alt"`
 	NavPlace           string   `json:"navplace"`
 	NavPlaceAlt        []string `json:"navplace_alt"`
+	NullIslandFaceted string `json:"nullisland_faceted"`	
+	PlacetypeFaceted   string   `json:"placetype_faceted"`
+	RecentFaceted      string   `json:"recent_faceted"`
+	SearchFaceted      string   `json:"search_faceted"`
 	Select             string   `json:"select"`
 	SelectAlt          []string `json:"select_alt"`
 	SPR                string   `json:"spr"`
@@ -81,20 +94,28 @@ func DefaultURIs() *URIs {
 		Index:                  "/",
 		Search:                 "/search",
 		About:                  "/about",
+		Code:                  "/code",
+		NullIsland:                  "/nullisland",				
 		Placetypes:             "/placetypes",
 		Placetype:              "/placetypes/{placetype}",
-		Concordances:           "/concordances/",
+		Concordances:           "/concordances",
 		ConcordanceNS:          "/concordances/{namespace}",
 		ConcordanceNSPred:      "/concordances/{namespace}:{predicate}",
-		ConcordanceNSPredValue: "/concordances/{namespace}:{predicate}={value}",
-		Recent:                 "/recent/",
-		Id:                     "/id/{id}",
-		Descendants:            "/id/{id}/descendants",
+		ConcordanceTriple: "/concordances/{namespace}:{predicate}={value}",
+		Recent:                 "/recent/{duration}",
+		RecentAlt: []string{
+			"/recent",
+		},
+		Id:          "/id/{id}",
+		Descendants: "/id/{id}/descendants",
 
 		// Static Assets
 		Static: "/static/",
 
 		// API/machine-readable
+		ConcordanceNSFaceted: "/concordances/{namespace}/facets",
+		ConcordanceNSPredFaceted: "/concordances/{namespace}:{predicate}/facets",				
+		ConcordanceTripleFaceted: "/concordances/{namespace}:{predicate}={value}/facets",		
 		DescendantsFaceted: "/id/{id}/descendants/facets",
 
 		GeoJSON: "/geojson/",
@@ -109,7 +130,11 @@ func DefaultURIs() *URIs {
 		NavPlaceAlt: []string{
 			"/id/{id}/navplace",
 		},
-		Select: "/select/",
+		NullIslandFaceted:    "/nullisland/facets",		
+		PlacetypeFaceted: "/placetypes/{placetype}/facets",
+		RecentFaceted:    "/recent/{duration}/facets",
+		SearchFaceted:           "/search/facets",		
+		Select:           "/select/",
 		SelectAlt: []string{
 			"/id/{id}/select",
 		},
@@ -126,8 +151,92 @@ func DefaultURIs() *URIs {
 	return uris_table
 }
 
-func URIForId(uri string, id int64) string {
-	return ReplaceAll(uri, "{id}", id)
+func URIForIdSimple(uri string, id int64) string {
+	id_uri := ReplaceAll(uri, "{id}", id)
+	return uriWithFilters(id_uri, nil, nil)
+}
+
+func URIForId(uri string, id int64, filters []spelunker.Filter, facets []spelunker.Facet) string {
+
+	id_uri := ReplaceAll(uri, "{id}", id)
+	return uriWithFilters(id_uri, filters, facets)
+}
+
+func URIForPlacetype(uri string, pt string, filters []spelunker.Filter, facets []spelunker.Facet) string {
+
+	pt_uri := ReplaceAll(uri, "{placetype}", pt)
+	return uriWithFilters(pt_uri, filters, facets)
+}
+
+func URIForRecentSimple(uri string, d string) string {
+	r_uri := ReplaceAll(uri, "{duration}", d)
+	return uriWithFilters(r_uri, nil, nil)
+}
+
+func URIForRecent(uri string, d string, filters []spelunker.Filter, facets []spelunker.Facet) string {
+
+	r_uri := ReplaceAll(uri, "{duration}", d)
+	return uriWithFilters(r_uri, filters, facets)
+}
+
+func URIForConcordanceNS(uri string, ns string, filters []spelunker.Filter, facets []spelunker.Facet) string {
+
+	c_uri := ReplaceAll(uri, "{namespace}", ns)
+	return uriWithFilters(c_uri, filters, facets)
+}
+
+func URIForConcordanceNSPred(uri string, ns string, pred string, filters []spelunker.Filter, facets []spelunker.Facet) string {
+
+	c_uri := uri
+
+	c_uri = ReplaceAll(c_uri, "{namespace}", ns)
+	c_uri = ReplaceAll(c_uri, "{predicate}", pred)
+	return uriWithFilters(c_uri, filters, facets)
+}
+
+func URIForConcordanceTriple(uri string, ns string, pred string, value any, filters []spelunker.Filter, facets []spelunker.Facet) string {
+
+	c_uri := uri
+	
+	c_uri = ReplaceAll(c_uri, "{namespace}", ns)
+	c_uri = ReplaceAll(c_uri, "{predicate}", pred)
+	c_uri = ReplaceAll(c_uri, "{value}", value)		
+	return uriWithFilters(c_uri, filters, facets)
+}
+
+func URIForSearch(uri string, query string, filters []spelunker.Filter, facets []spelunker.Facet) string {
+
+	u, _ := url.Parse(uri)
+	q := u.Query()
+
+	q.Set("q", query)
+	u.RawQuery = q.Encode()
+
+	return uriWithFilters(u.String(), filters, facets)
+}
+
+func URIForNullIsland(uri string, filters []spelunker.Filter, facets []spelunker.Facet) string {
+
+	return uriWithFilters(uri, filters, facets)
+}
+
+func uriWithFilters(uri string, filters []spelunker.Filter, facets []spelunker.Facet) string {
+
+	u, _ := url.Parse(uri)
+	q := u.Query()
+
+	for _, f := range filters {
+		q.Set(f.Scheme(), fmt.Sprintf("%v", f.Value()))
+	}
+
+	for _, f := range facets {
+		q.Set("facet", f.String())
+	}
+
+	u.RawQuery = q.Encode()
+
+	slog.Debug("URI", "with filters and facets", u.String())
+	return u.String()
 }
 
 func ReplaceAll(input string, pattern string, value any) string {
