@@ -219,8 +219,8 @@ func (s *OpenSearchSpelunker) facetsToAggregations(facets []*spelunker.Facet) st
 		var facet_field string
 
 		switch f.String() {
-		case "is_current":
-			facet_field = fmt.Sprintf("mz:%s", f)
+		case "iscurrent":
+			facet_field = "mz:is_current"
 		default:
 			facet_field = fmt.Sprintf("wof:%s", f)			
 		}
@@ -240,8 +240,8 @@ func (s *OpenSearchSpelunker) mustQueryWithFiltersCriteria(must []string, filter
 			must = append(must, fmt.Sprintf(`{ "term": { "wof:placetype": "%s" } }`, f.Value()))
 		case "country":
 			must = append(must, fmt.Sprintf(`{ "term": { "wof:country": "%s" } }`, f.Value()))
-		case "is_current":
-			must = append(must, fmt.Sprintf(`{ "term": { "mz:is_current": "%s" } }`, f.Value()))						
+		case "iscurrent":
+			must = append(must, fmt.Sprintf(`{ "term": { "mz:is_current": "%d" } }`, f.Value()))						
 		default:
 			slog.Warn("Unsupported filter scheme", "scheme", f.Scheme())
 		}
