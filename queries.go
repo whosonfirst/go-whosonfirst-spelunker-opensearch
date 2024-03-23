@@ -19,6 +19,47 @@ func (s *OpenSearchSpelunker) idQuery(id int64) string {
 	return fmt.Sprintf(`{"query": { "ids": { "values": [ %d ] } } }`, id)
 }
 
+// Null Island
+
+func (s *OpenSearchSpelunker) visitingNullIslandQuery(filters []spelunker.Filter) string {
+
+	q := s.visitingNullIslandQueryCriteria(filters)
+	return fmt.Sprintf(`{"query": %s }`, q)
+}
+
+func (s *OpenSearchSpelunker) visitingNullIslandFacetedQuery(filters []spelunker.Filter, facets []*spelunker.Facet) string {
+
+	q := s.visitingNullIslandQueryCriteria(filters)
+	str_aggs := s.facetsToAggregations(facets)
+	
+	return fmt.Sprintf(`{"query": %s, "aggs": { %s } }`, q, str_aggs)
+}
+
+func (s *OpenSearchSpelunker) visitingNullIslandQueryCriteria(filters []spelunker.Filter) string {
+
+	terms := []string{
+		`{ "term": { "geom:latitude":  0.0  } }`,
+		`{ "term": { "geom:longitude":  0.0  } }`,
+	}
+
+	str_terms := strings.Join(terms, ",")
+	
+	q := fmt.Sprintf(`{ "bool": { "must": [ %s ] } }`, str_terms)
+	
+	if len(filters) == 0 {
+		return q
+	}
+
+	must := []string{
+		q,
+	}
+
+	return s.mustQueryWithFiltersCriteria(must, filters)
+	return fmt.Sprintf(`{"query": %s }`, q)	
+}
+
+// Descendants
+
 func (s *OpenSearchSpelunker) descendantsQuery(id int64, filters []spelunker.Filter) string {
 
 	q := s.descendantsQueryCriteria(id, filters)
