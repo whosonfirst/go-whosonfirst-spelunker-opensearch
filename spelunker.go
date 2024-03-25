@@ -6,6 +6,7 @@ import (
 	"io"
 	"log/slog"
 	"math"
+	"net/http"
 	"net/url"
 	"strings"
 	"time"
@@ -66,7 +67,7 @@ func NewOpenSearchSpelunker(ctx context.Context, uri string) (spelunker.Spelunke
 	return s, nil
 }
 
-func (s *OpenSearchSpelunker) GetById(ctx context.Context, id int64) ([]byte, error) {
+func (s *OpenSearchSpelunker) GetRecordForId(ctx context.Context, id int64, ) ([]byte, error) {
 
 	q := fmt.Sprintf(`{"query": { "ids": { "values": [ %d ] } } }`, id)
 
@@ -87,12 +88,38 @@ func (s *OpenSearchSpelunker) GetById(ctx context.Context, id int64) ([]byte, er
 		return nil, fmt.Errorf("First hit missing")
 	}
 
-	return s.propsToGeoJSON(r.String()), nil
+	return []byte(r.String()), nil
 }
 
-func (s *OpenSearchSpelunker) GetAlternateGeometryById(ctx context.Context, id int64, alt_geom *uri.AltGeom) ([]byte, error) {
+func (s *OpenSearchSpelunker) GetFeatureForId(ctx context.Context, id int64, uri_args *uri.URIArgs) ([]byte, error) {
 
-	return nil, spelunker.ErrNotImplemented
+	r, err := s.GetRecordForId(ctx, id)
+
+	if err != nil {
+		return nil, err
+	}
+
+	rel_path, err := uri.Id2RelPath(id, uri_args)
+
+	if err != nil {
+		return nil, err
+	}
+
+	// REPLACE WITH whosonfirst/go-reader
+	
+	repo_name := gjson.GetBytes(r, "wof:repo")
+	
+	github_url := fmt.Sprintf("https://raw.githubusercontent.com/whosonfirst-data/%s/master/data/%s", repo_name, rel_path)
+
+	rsp, err := http.Get(github_url)
+
+	if err != nil {
+		return nil, err
+	}
+
+	defer rsp.Body.Close()
+
+	return io.ReadAll(rsp.Body)
 }
 
 func (s *OpenSearchSpelunker) facet(ctx context.Context, req *opensearchapi.SearchRequest, facets []*spelunker.Facet) ([]*spelunker.Faceting, error) {
@@ -296,18 +323,18 @@ func (s *OpenSearchSpelunker) searchWithScroll(ctx context.Context, req *opensea
 	return body, nil
 }
 
-func (s *OpenSearchSpelunker) propsToGeoJSON(props string) []byte {
+func (s *OpenSearchSpelunker) propsToGeoJSON(props []byte) []byte {
 
 	// See this? It's a derived geometry. Still working through
 	// how to signal and how to fetch full geometry...
 
-	lat_rsp := gjson.Get(props, "geom:latitude")
-	lon_rsp := gjson.Get(props, "geom:longitude")
+	lat_rsp := gjson.GetBytes(props, "geom:latitude")
+	lon_rsp := gjson.GetBytes(props, "geom:longitude")
 
 	lat := lat_rsp.String()
 	lon := lon_rsp.String()
 
-	return []byte(`{"type": "Feature", "properties": ` + props + `, "geometry": { "type": "Point", "coordinates": [` + lon + `,` + lat + `] } }`)
+	return []byte(`{"type": "Feature", "properties": ` + string(props) + `, "geometry": { "type": "Point", "coordinates": [` + lon + `,` + lat + `] } }`)
 }
 
 func (s *OpenSearchSpelunker) countForQuery(ctx context.Context, q string) (int64, error) {

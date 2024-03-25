@@ -18,7 +18,8 @@ index:
 server:
 	go run -mod $(GOMOD) cmd/httpd/main.go \
 		-server-uri http://localhost:8080 \
-		-spelunker-uri '$(SPELUNKER_URI)'
+		-spelunker-uri '$(SPELUNKER_URI)' \
+		-protomaps-api-key '$(APIKEY)'
 
 # https://opensearch.org/docs/latest/install-and-configure/install-opensearch/docker/
 #
