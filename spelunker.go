@@ -6,7 +6,7 @@ import (
 	"io"
 	"log/slog"
 	"math"
-	"net/http"
+	_ "net/http"
 	"net/url"
 	"strings"
 	"time"
@@ -21,15 +21,20 @@ import (
 	"github.com/whosonfirst/go-whosonfirst-spelunker"
 	wof_spr "github.com/whosonfirst/go-whosonfirst-spr/v2"
 	"github.com/whosonfirst/go-whosonfirst-uri"
+	"github.com/whosonfirst/go-reader"
+	_ "github.com/whosonfirst/go-reader-findingaid"
 )
 
 const scroll_duration time.Duration = 5 * time.Minute
 const scroll_trigger int64 = 10000
 
+const findingaid_reader_uri string = "findingaid://https/data.whosonfirst.org/findingaid?template=https://raw.githubusercontent.com/whosonfirst-data/{repo}/master/data/&user-agent=Mozilla%2F5.0+%28Macintosh%3B+Intel+Mac+OS+X+10.15%3B+rv%3A124.0%29+Gecko%2F20100101+Firefox%2F124.0"
+
 type OpenSearchSpelunker struct {
 	spelunker.Spelunker
 	client *opensearch.Client
 	index  string
+	reader reader.Reader
 }
 
 func init() {
@@ -59,9 +64,22 @@ func NewOpenSearchSpelunker(ctx context.Context, uri string) (spelunker.Spelunke
 		return nil, fmt.Errorf("Failed to create opensearch client, %w", err)
 	}
 
+	reader_uri := findingaid_reader_uri
+
+	if q.HasString("reader-uri"){
+		reader_uri = q.Get("reader_uri")
+	}
+	
+	r, err := reader.NewReader(ctx, reader_uri)
+
+	if err != nil {
+		return nil, fmt.Errorf("Failed to create reader, %w", err)
+	}
+	
 	s := &OpenSearchSpelunker{
 		client: cl,
 		index:  "spelunker",
+		reader: r,
 	}
 
 	return s, nil
@@ -93,19 +111,28 @@ func (s *OpenSearchSpelunker) GetRecordForId(ctx context.Context, id int64, ) ([
 
 func (s *OpenSearchSpelunker) GetFeatureForId(ctx context.Context, id int64, uri_args *uri.URIArgs) ([]byte, error) {
 
-	r, err := s.GetRecordForId(ctx, id)
-
-	if err != nil {
-		return nil, err
-	}
-
 	rel_path, err := uri.Id2RelPath(id, uri_args)
 
 	if err != nil {
 		return nil, err
 	}
 
-	// REPLACE WITH whosonfirst/go-reader
+	r, err := s.reader.Read(ctx, rel_path)
+	
+	if err != nil {
+		return nil, err
+	}
+
+	defer r.Close()
+	return io.ReadAll(r)
+	
+	/*
+
+	record, err := s.GetRecordForId(ctx, id)
+
+	if err != nil {
+		return nil, err
+	}
 	
 	repo_name := gjson.GetBytes(r, "wof:repo")
 	
@@ -120,6 +147,7 @@ func (s *OpenSearchSpelunker) GetFeatureForId(ctx context.Context, id int64, uri
 	defer rsp.Body.Close()
 
 	return io.ReadAll(rsp.Body)
+	*/
 }
 
 func (s *OpenSearchSpelunker) facet(ctx context.Context, req *opensearchapi.SearchRequest, facets []*spelunker.Facet) ([]*spelunker.Faceting, error) {
