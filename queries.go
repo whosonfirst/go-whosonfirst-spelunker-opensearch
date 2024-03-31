@@ -260,10 +260,14 @@ func (s *OpenSearchSpelunker) facetsToAggregations(facets []*spelunker.Facet) st
 		var facet_field string
 
 		switch f.String() {
+		case "isdeprecated":
+			// This flag is derived in go-whosonfirst-spelunker/document and
+			// assigned in go-whosonfirst-opensearch
+			facet_field = "mz:is_deprecated"
 		case "iscurrent":
 			facet_field = "mz:is_current"
 		default:
-			facet_field = fmt.Sprintf("wof:%s", f)			
+			facet_field = fmt.Sprintf("wof:%s", f)
 		}
 		
 		aggs[i] = fmt.Sprintf(`"%s": { "terms": { "field": "%s", "size": 1000 } }`, f, facet_field)
@@ -282,7 +286,9 @@ func (s *OpenSearchSpelunker) mustQueryWithFiltersCriteria(must []string, filter
 		case "country":
 			must = append(must, fmt.Sprintf(`{ "term": { "wof:country": "%s" } }`, f.Value()))
 		case "iscurrent":
-			must = append(must, fmt.Sprintf(`{ "term": { "mz:is_current": "%d" } }`, f.Value()))						
+			must = append(must, fmt.Sprintf(`{ "term": { "mz:is_current": "%d" } }`, f.Value()))
+		case "isdeprecated":
+			must = append(must, fmt.Sprintf(`{ "term": { "mz:is_deprecated": "%d" } }`, f.Value()))									
 		default:
 			slog.Warn("Unsupported filter scheme", "scheme", f.Scheme())
 		}
