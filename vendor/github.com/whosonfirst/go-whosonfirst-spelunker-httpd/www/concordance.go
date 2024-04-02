@@ -60,7 +60,7 @@ func HasConcordanceHandler(opts *HasConcordanceHandlerOptions) (http.Handler, er
 		logger = logger.With("namespace", ns)
 		logger = logger.With("predicate", pred)
 		logger = logger.With("value", value)
-		
+
 		if ns == "*" {
 			ns = ""
 		}
@@ -72,7 +72,7 @@ func HasConcordanceHandler(opts *HasConcordanceHandlerOptions) (http.Handler, er
 		if value == "*" {
 			value = ""
 		}
-		
+
 		c := spelunker.NewConcordanceFromTriple(ns, pred, value)
 
 		pg_opts, err := httpd.PaginationOptionsFromRequest(req)
@@ -83,7 +83,7 @@ func HasConcordanceHandler(opts *HasConcordanceHandlerOptions) (http.Handler, er
 			return
 		}
 
-		filter_params := httpd.DefaultFilterParams()		
+		filter_params := httpd.DefaultFilterParams()
 
 		filters, err := httpd.FiltersFromRequest(ctx, req, filter_params)
 
@@ -106,7 +106,7 @@ func HasConcordanceHandler(opts *HasConcordanceHandlerOptions) (http.Handler, er
 		var src *sources.WOFSource
 
 		if ns != "" {
-			
+
 			v, err := sources.GetSourceByPrefix(ns)
 
 			if err != nil {
@@ -126,38 +126,38 @@ func HasConcordanceHandler(opts *HasConcordanceHandlerOptions) (http.Handler, er
 			facets_url = httpd.URIForConcordanceTriple(opts.URIs.ConcordanceTripleFaceted, ns, pred, value, filters, nil)
 		case ns != "" && pred != "":
 			pagination_url = httpd.URIForConcordanceNSPred(opts.URIs.ConcordanceNSPred, ns, pred, filters, nil)
-			facets_url = httpd.URIForConcordanceNSPred(opts.URIs.ConcordanceNSPredFaceted, ns, pred, filters, nil)						
+			facets_url = httpd.URIForConcordanceNSPred(opts.URIs.ConcordanceNSPredFaceted, ns, pred, filters, nil)
 		case pred != "" && value != "":
 			pagination_url = httpd.URIForConcordanceTriple(opts.URIs.ConcordanceTriple, "*", pred, value, filters, nil)
-			facets_url = httpd.URIForConcordanceTriple(opts.URIs.ConcordanceTripleFaceted, "*", pred, value, filters, nil)			
+			facets_url = httpd.URIForConcordanceTriple(opts.URIs.ConcordanceTripleFaceted, "*", pred, value, filters, nil)
 		case ns != "" && value != "":
 			pagination_url = httpd.URIForConcordanceTriple(opts.URIs.ConcordanceTriple, ns, "*", value, filters, nil)
-			facets_url = httpd.URIForConcordanceTriple(opts.URIs.ConcordanceTripleFaceted, ns, "*", value, filters, nil)			
+			facets_url = httpd.URIForConcordanceTriple(opts.URIs.ConcordanceTripleFaceted, ns, "*", value, filters, nil)
 		case ns != "":
 			pagination_url = httpd.URIForConcordanceNS(opts.URIs.ConcordanceNS, ns, filters, nil)
-			pagination_url = httpd.URIForConcordanceNS(opts.URIs.ConcordanceNS, ns, filters, nil)			
+			facets_url = httpd.URIForConcordanceNS(opts.URIs.ConcordanceNSFaceted, ns, filters, nil)
 		case pred != "":
 			pagination_url = httpd.URIForConcordanceTriple(opts.URIs.ConcordanceTriple, "*", pred, "*", filters, nil)
-			facets_url = httpd.URIForConcordanceTriple(opts.URIs.ConcordanceTripleFaceted, "*", pred, "*", filters, nil)			
+			facets_url = httpd.URIForConcordanceTriple(opts.URIs.ConcordanceTripleFaceted, "*", pred, "*", filters, nil)
 		case value != "":
 			pagination_url = httpd.URIForConcordanceTriple(opts.URIs.ConcordanceTriple, "*", "*", value, filters, nil)
-			facets_url = httpd.URIForConcordanceTriple(opts.URIs.ConcordanceTripleFaceted, "*", "*", value, filters, nil)			
+			facets_url = httpd.URIForConcordanceTriple(opts.URIs.ConcordanceTripleFaceted, "*", "*", value, filters, nil)
 		default:
-			
+			logger.Info("WUT")
 		}
 
 		facets_context_url = req.URL.Path
-				
+
 		vars := HasConcordanceHandlerVars{
-			PageTitle:     page_title,
-			URIs:          opts.URIs,
-			Concordance:   c,
-			Places:        r.Results(),
-			Pagination:    pg_r,
-			Source:        src,
+			PageTitle:        page_title,
+			URIs:             opts.URIs,
+			Concordance:      c,
+			Places:           r.Results(),
+			Pagination:       pg_r,
+			Source:           src,
 			PaginationURL:    pagination_url,
 			FacetsURL:        facets_url,
-			FacetsContextURL: facets_context_url,			
+			FacetsContextURL: facets_context_url,
 		}
 
 		rsp.Header().Set("Content-Type", "text/html")

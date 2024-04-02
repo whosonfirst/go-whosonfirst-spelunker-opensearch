@@ -5,7 +5,7 @@ import (
 	"log/slog"
 	"net/url"
 	"strings"
-	
+
 	"github.com/whosonfirst/go-whosonfirst-sources"
 	"golang.org/x/text/language"
 	"golang.org/x/text/message"
@@ -15,7 +15,7 @@ func NameForSource(source string) string {
 
 	nspred := strings.Split(source, ":")
 	prefix := nspred[0]
-	
+
 	src, err := sources.GetSourceByPrefix(prefix)
 
 	if err != nil {

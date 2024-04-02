@@ -12,7 +12,7 @@ import (
 )
 
 type SearchFacetedHandlerOptions struct {
-	Spelunker     spelunker.Spelunker
+	Spelunker spelunker.Spelunker
 	// Authenticator auth.Authenticator
 }
 
@@ -37,7 +37,7 @@ func SearchFacetedHandler(opts *SearchFacetedHandlerOptions) (http.Handler, erro
 			http.Error(rsp, "Bad request", http.StatusBadRequest)
 			return
 		}
-				
+
 		search_opts := &spelunker.SearchOptions{
 			Query: q,
 		}
@@ -73,7 +73,7 @@ func SearchFacetedHandler(opts *SearchFacetedHandlerOptions) (http.Handler, erro
 			http.Error(rsp, "Internal server error", http.StatusInternalServerError)
 			return
 		}
-		
+
 		if err != nil {
 			logger.Error("Failed to get facets for search", "error", err)
 			http.Error(rsp, "Internal server error", http.StatusInternalServerError)
@@ -90,7 +90,7 @@ func SearchFacetedHandler(opts *SearchFacetedHandlerOptions) (http.Handler, erro
 			http.Error(rsp, "Internal server error", http.StatusInternalServerError)
 			return
 		}
-		
+
 	}
 
 	h := http.HandlerFunc(fn)

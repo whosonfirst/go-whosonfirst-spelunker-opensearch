@@ -1,18 +1,18 @@
 package api
 
 import (
+	"encoding/json"
 	"log/slog"
 	"net/http"
 	"strings"
-	"encoding/json"
-	
+
 	// "github.com/sfomuseum/go-http-auth"
 	"github.com/whosonfirst/go-whosonfirst-spelunker"
 	"github.com/whosonfirst/go-whosonfirst-spelunker-httpd"
 )
 
 type HasConcordanceFacetedHandlerOptions struct {
-	Spelunker     spelunker.Spelunker
+	Spelunker spelunker.Spelunker
 	// Authenticator auth.Authenticator
 }
 
@@ -44,7 +44,7 @@ func HasConcordanceFacetedHandler(opts *HasConcordanceFacetedHandlerOptions) (ht
 		if value == "*" {
 			value = ""
 		}
-		
+
 		// c := spelunker.NewConcordanceFromTriple(ns, pred, value)
 
 		logger = logger.With("namespace", ns)

@@ -53,7 +53,7 @@ func NullIslandHandler(opts *NullIslandHandlerOptions) (http.Handler, error) {
 			return
 		}
 
-		filter_params := httpd.DefaultFilterParams()		
+		filter_params := httpd.DefaultFilterParams()
 
 		filters, err := httpd.FiltersFromRequest(ctx, req, filter_params)
 
@@ -76,7 +76,7 @@ func NullIslandHandler(opts *NullIslandHandlerOptions) (http.Handler, error) {
 
 		// This is not ideal but I am not sure what is better yet...
 		facets_url := httpd.URIForNullIsland(opts.URIs.NullIslandFaceted, filters, nil)
-		facets_context_url := req.URL.Path
+		facets_context_url := pagination_url
 
 		vars := NullIslandHandlerVars{
 			Places:           r.Results(),

@@ -22,30 +22,30 @@ type SearchHandlerOptions struct {
 }
 
 type SearchHandlerVars struct {
-	PageTitle     string
-	URIs          *httpd.URIs
-	Places        []spr.StandardPlacesResult
-	Pagination    pagination.Results
-	PaginationURL string
+	PageTitle        string
+	URIs             *httpd.URIs
+	Places           []spr.StandardPlacesResult
+	Pagination       pagination.Results
+	PaginationURL    string
 	FacetsURL        string
 	FacetsContextURL string
-	SearchOptions *spelunker.SearchOptions
+	SearchOptions    *spelunker.SearchOptions
 }
 
 func SearchHandler(opts *SearchHandlerOptions) (http.Handler, error) {
 
 	form_t := opts.Templates.Lookup("search")
-	
+
 	if form_t == nil {
 		return nil, fmt.Errorf("Failed to locate 'search' template")
 	}
 
 	results_t := opts.Templates.Lookup("search_results")
-	
+
 	if results_t == nil {
 		return nil, fmt.Errorf("Failed to locate 'search_results' template")
 	}
-	
+
 	fn := func(rsp http.ResponseWriter, req *http.Request) {
 
 		ctx := req.Context()
@@ -69,9 +69,9 @@ func SearchHandler(opts *SearchHandlerOptions) (http.Handler, error) {
 		if q == "" {
 
 			rsp.Header().Set("Content-Type", "text/html")
-			
+
 			err = form_t.Execute(rsp, vars)
-			
+
 			if err != nil {
 				logger.Error("Failed to return ", "error", err)
 				http.Error(rsp, "Internal server error", http.StatusInternalServerError)
@@ -79,18 +79,18 @@ func SearchHandler(opts *SearchHandlerOptions) (http.Handler, error) {
 
 			return
 		}
-		
-			pg_opts, err := httpd.PaginationOptionsFromRequest(req)
 
-			if err != nil {
-				logger.Error("Failed to create pagination options", "error", err)
-				http.Error(rsp, "Internal server error", http.StatusInternalServerError)
-				return
-			}
+		pg_opts, err := httpd.PaginationOptionsFromRequest(req)
 
-			search_opts := &spelunker.SearchOptions{
-				Query: q,
-			}
+		if err != nil {
+			logger.Error("Failed to create pagination options", "error", err)
+			http.Error(rsp, "Internal server error", http.StatusInternalServerError)
+			return
+		}
+
+		search_opts := &spelunker.SearchOptions{
+			Query: q,
+		}
 
 		filter_params := httpd.DefaultFilterParams()
 
@@ -101,23 +101,22 @@ func SearchHandler(opts *SearchHandlerOptions) (http.Handler, error) {
 			http.Error(rsp, "Bad request", http.StatusBadRequest)
 			return
 		}
-			
-			r, pg_r, err := opts.Spelunker.Search(ctx, pg_opts, search_opts, filters)
 
-			if err != nil {
-				logger.Error("Failed to get search", "error", err)
-				http.Error(rsp, "Internal server error", http.StatusInternalServerError)
-				return
-			}
+		r, pg_r, err := opts.Spelunker.Search(ctx, pg_opts, search_opts, filters)
 
-			vars.Places = r.Results()
-			vars.Pagination = pg_r
+		if err != nil {
+			logger.Error("Failed to get search", "error", err)
+			http.Error(rsp, "Internal server error", http.StatusInternalServerError)
+			return
+		}
 
-		
+		vars.Places = r.Results()
+		vars.Pagination = pg_r
+
 		pagination_url := httpd.URIForSearch(opts.URIs.Search, q, filters, nil)
 		facets_url := httpd.URIForSearch(opts.URIs.SearchFaceted, q, filters, nil)
 		facets_context_url := httpd.URIForSearch(opts.URIs.Search, q, filters, nil)
-		
+
 		vars.PaginationURL = pagination_url
 		vars.FacetsURL = facets_url
 		vars.FacetsContextURL = facets_context_url
@@ -126,7 +125,7 @@ func SearchHandler(opts *SearchHandlerOptions) (http.Handler, error) {
 		rsp.Header().Set("Content-Type", "text/html")
 
 		err = results_t.Execute(rsp, vars)
-		
+
 		if err != nil {
 			logger.Error("Failed to return ", "error", err)
 			http.Error(rsp, "Internal server error", http.StatusInternalServerError)

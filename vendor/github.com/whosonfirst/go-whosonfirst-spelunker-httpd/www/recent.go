@@ -9,12 +9,12 @@ import (
 	"time"
 
 	"github.com/aaronland/go-pagination"
+	"github.com/dustin/go-humanize"
 	"github.com/sfomuseum/go-http-auth"
 	"github.com/sfomuseum/iso8601duration"
 	"github.com/whosonfirst/go-whosonfirst-spelunker"
 	"github.com/whosonfirst/go-whosonfirst-spelunker-httpd"
 	"github.com/whosonfirst/go-whosonfirst-spr/v2"
-	"github.com/dustin/go-humanize"
 )
 
 type RecentHandlerOptions struct {
@@ -25,14 +25,14 @@ type RecentHandlerOptions struct {
 }
 
 type RecentHandlerVars struct {
-	PageTitle        string
-	URIs             *httpd.URIs
-	Places           []spr.StandardPlacesResult
-	Pagination       pagination.Results
-	PaginationURL    string
+	PageTitle     string
+	URIs          *httpd.URIs
+	Places        []spr.StandardPlacesResult
+	Pagination    pagination.Results
+	PaginationURL string
 	// Duration         time.Duration
-	Duration *duration.Duration
-	Since string
+	Duration         *duration.Duration
+	Since            string
 	FacetsURL        string
 	FacetsContextURL string
 }
@@ -93,7 +93,7 @@ func RecentHandler(opts *RecentHandlerOptions) (http.Handler, error) {
 			return
 		}
 
-		filter_params := httpd.DefaultFilterParams()		
+		filter_params := httpd.DefaultFilterParams()
 
 		filters, err := httpd.FiltersFromRequest(ctx, req, filter_params)
 
@@ -116,7 +116,7 @@ func RecentHandler(opts *RecentHandlerOptions) (http.Handler, error) {
 
 		// This is not ideal but I am not sure what is better yet...
 		facets_url := httpd.URIForRecent(opts.URIs.RecentFaceted, str_d, filters, nil)
-		facets_context_url := req.URL.Path
+		facets_context_url := pagination_url
 
 		now := time.Now()
 		now_ts := now.Unix()
@@ -125,15 +125,15 @@ func RecentHandler(opts *RecentHandlerOptions) (http.Handler, error) {
 		then := time.Unix(then_ts, 0)
 
 		since := humanize.RelTime(now, then, "", "")
-		
+
 		vars := RecentHandlerVars{
-			Places:           r.Results(),
-			Pagination:       pg_r,
-			URIs:             opts.URIs,
-			PaginationURL:    pagination_url,
+			Places:        r.Results(),
+			Pagination:    pg_r,
+			URIs:          opts.URIs,
+			PaginationURL: pagination_url,
 			// Duration:         d.ToDuration(),
-			Duration: d,
-			Since: since,
+			Duration:         d,
+			Since:            since,
 			FacetsURL:        facets_url,
 			FacetsContextURL: facets_context_url,
 		}

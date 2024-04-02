@@ -23,12 +23,13 @@ type SpelunkerInitializationFunc func(ctx context.Context, uri string) (Spelunke
 
 // Spelunker is an interface for writing data to multiple sources or targets.
 type Spelunker interface {
-	// Retrieve an individual Who's On First record by its unique ID
-	GetById(context.Context, int64) ([]byte, error)
-	// Retrieve an alternate geometry record for a Who's On First record by its unique ID.
-	GetAlternateGeometryById(context.Context, int64, *uri.AltGeom) ([]byte, error)
-	// Retrieve all the Who's On First record that are a descendant of a specific Who's On First ID.
 
+	// Retrieve properties (or more specifically the "document") for...
+	GetRecordForId(context.Context, int64) ([]byte, error)
+	// Retrive GeoJSON Feature for...
+	GetFeatureForId(context.Context, int64, *uri.URIArgs) ([]byte, error)
+
+	// Retrieve all the Who's On First record that are a descendant of a specific Who's On First ID.
 	GetDescendants(context.Context, pagination.Options, int64, []Filter) (spr.StandardPlacesResults, pagination.Results, error)
 	GetDescendantsFaceted(context.Context, int64, []Filter, []*Facet) ([]*Faceting, error)
 	// Return the total number of Who's On First records that are a descendant of a specific Who's On First ID.

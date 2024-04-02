@@ -60,7 +60,7 @@ func RecentFacetedHandler(opts *RecentFacetedHandlerOptions) (http.Handler, erro
 			return
 		}
 
-		filter_params := httpd.DefaultFilterParams()		
+		filter_params := httpd.DefaultFilterParams()
 
 		filters, err := httpd.FiltersFromRequest(ctx, req, filter_params)
 
