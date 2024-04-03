@@ -12,7 +12,7 @@ LIST_REPOS=/usr/local/whosonfirst/go-whosonfirst-github/bin/wof-list-repos
 OPENSEARCH_INDEX=/usr/local/whosonfirst/go-whosonfirst-opensearch/bin/wof-opensearch-index
 
 # Maybe make this a CLI option...
-LIST_REPOS_PREFIX=whosonfirst-data-admin-a
+LIST_REPOS_PREFIX=whosonfirst-data-admin-d
 
 # This is for debugging. Do not change this at your own risk.
 # (That means you should change this.)

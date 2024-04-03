@@ -4,9 +4,9 @@ import (
 	"context"
 	"strings"
 	"time"
-	
+
 	"github.com/aaronland/go-pagination"
-	opensearchapi "github.com/opensearch-project/opensearch-go/v2/opensearchapi"	
+	opensearchapi "github.com/opensearch-project/opensearch-go/v2/opensearchapi"
 	"github.com/whosonfirst/go-whosonfirst-spelunker"
 	wof_spr "github.com/whosonfirst/go-whosonfirst-spr/v2"
 )
@@ -27,5 +27,5 @@ func (s *OpenSearchSpelunker) GetRecentFaceted(ctx context.Context, d time.Durat
 		Size: &sz,
 	}
 
-	return s.facet(ctx, req, facets)	
+	return s.facet(ctx, req, facets)
 }

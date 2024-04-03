@@ -87,6 +87,18 @@ func (s *NullSpelunker) HasConcordanceFaceted(ctx context.Context, namespace str
 	return nil, ErrNotImplemented
 }
 
+func (s *NullSpelunker) GetTags(ctx context.Context) (*Faceting, error) {
+	return nil, ErrNotImplemented
+}
+
+func (s *NullSpelunker) HasTag(ctx context.Context, pg_opts pagination.Options, tag string, filters []Filter) (spr.StandardPlacesResults, pagination.Results, error) {
+	return nil, nil, ErrNotImplemented
+}
+
+func (s *NullSpelunker) HasTagFaceted(ctx context.Context, tag string, filters []Filter, facets []*Facet) ([]*Faceting, error) {
+	return nil, ErrNotImplemented
+}
+
 func (s *NullSpelunker) VisitingNullIsland(ctx context.Context, pg_opts pagination.Options, filters []Filter) (spr.StandardPlacesResults, pagination.Results, error) {
 	return nil, nil, ErrNotImplemented
 }

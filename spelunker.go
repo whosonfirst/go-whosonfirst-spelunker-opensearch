@@ -17,12 +17,12 @@ import (
 	opensearch "github.com/opensearch-project/opensearch-go/v2"
 	opensearchapi "github.com/opensearch-project/opensearch-go/v2/opensearchapi"
 	"github.com/tidwall/gjson"
+	"github.com/whosonfirst/go-reader"
+	_ "github.com/whosonfirst/go-reader-http"
 	"github.com/whosonfirst/go-whosonfirst-opensearch/client"
 	"github.com/whosonfirst/go-whosonfirst-spelunker"
 	wof_spr "github.com/whosonfirst/go-whosonfirst-spr/v2"
 	"github.com/whosonfirst/go-whosonfirst-uri"
-	"github.com/whosonfirst/go-reader"
-	_ "github.com/whosonfirst/go-reader-http"
 )
 
 const scroll_duration time.Duration = 5 * time.Minute
@@ -67,23 +67,23 @@ func NewOpenSearchSpelunker(ctx context.Context, uri string) (spelunker.Spelunke
 		index:  "spelunker",
 	}
 
-	if q.Has("reader-uri"){
-		
+	if q.Has("reader-uri") {
+
 		reader_uri := q.Get("reader_uri")
-	
+
 		r, err := reader.NewReader(ctx, reader_uri)
-		
+
 		if err != nil {
 			return nil, fmt.Errorf("Failed to create reader, %w", err)
 		}
 
 		s.reader = r
 	}
-		
+
 	return s, nil
 }
 
-func (s *OpenSearchSpelunker) GetRecordForId(ctx context.Context, id int64, ) ([]byte, error) {
+func (s *OpenSearchSpelunker) GetRecordForId(ctx context.Context, id int64) ([]byte, error) {
 
 	q := fmt.Sprintf(`{"query": { "ids": { "values": [ %d ] } } }`, id)
 
@@ -116,18 +116,18 @@ func (s *OpenSearchSpelunker) GetFeatureForId(ctx context.Context, id int64, uri
 	}
 
 	f_reader := s.reader
-	
+
 	if f_reader == nil {
 
 		record, err := s.GetRecordForId(ctx, id)
-		
+
 		if err != nil {
 			return nil, err
 		}
-		
+
 		repo_name := gjson.GetBytes(record, "wof:repo")
 		reader_uri := fmt.Sprintf("https://raw.githubusercontent.com/whosonfirst-data/%s/master/data", repo_name)
-		
+
 		r, err := reader.NewReader(ctx, reader_uri)
 
 		if err != nil {
@@ -136,9 +136,9 @@ func (s *OpenSearchSpelunker) GetFeatureForId(ctx context.Context, id int64, uri
 
 		f_reader = r
 	}
-	
+
 	r, err := f_reader.Read(ctx, rel_path)
-	
+
 	if err != nil {
 		return nil, err
 	}
@@ -272,7 +272,7 @@ func (s *OpenSearchSpelunker) searchPaginated(ctx context.Context, pg_opts pagin
 	}
 
 	// To do: Check for expired scroll
-	
+
 	if err != nil {
 		return nil, nil, fmt.Errorf("Failed to execute search, %w", err)
 	}
@@ -329,7 +329,7 @@ func (s *OpenSearchSpelunker) searchWithScroll(ctx context.Context, req *opensea
 	defer rsp.Body.Close()
 
 	// To do: Check for expired cursor...
-	
+
 	if rsp.StatusCode != 200 {
 
 		// body, _ := io.ReadAll(rsp.Body)

@@ -4,7 +4,7 @@ import (
 	"context"
 	"fmt"
 	"strings"
-	
+
 	"github.com/aaronland/go-pagination"
 	opensearchapi "github.com/opensearch-project/opensearch-go/v2/opensearchapi"
 	"github.com/whosonfirst/go-whosonfirst-placetypes"
@@ -53,7 +53,5 @@ func (s *OpenSearchSpelunker) HasPlacetypeFaceted(ctx context.Context, pt *place
 		Size: &sz,
 	}
 
-	return s.facet(ctx, req, facets)	
+	return s.facet(ctx, req, facets)
 }
-
-
