@@ -12,7 +12,7 @@ LIST_REPOS=/usr/local/whosonfirst/go-whosonfirst-github/bin/wof-list-repos
 OPENSEARCH_INDEX=/usr/local/whosonfirst/go-whosonfirst-opensearch/bin/wof-opensearch-index
 
 # Maybe make this a CLI option...
-LIST_REPOS_PREFIX=whosonfirst-data-admin-d
+LIST_REPOS_PREFIX="-prefix whosonfirst-data-admin-it"
 
 # This is for debugging. Do not change this at your own risk.
 # (That means you should change this.)
@@ -23,7 +23,7 @@ OPENSEARCH_WRITER_URI=constant://?val=opensearch2%3A%2F%2Flocalhost%3A9200%2Fspe
 # Pull straight from GitHub, write to /tmp, remove after indexing
 ITERATOR_URI=git:///tmp
 
-REPOS=`${LIST_REPOS} -prefix ${LIST_REPOS_PREFIX} -exclude whosonfirst-data-admin-alt`
+REPOS=`${LIST_REPOS} ${LIST_REPOS_PREFIX} -exclude whosonfirst-data-admin-alt`
 
 for REPO in ${REPOS}
 do
