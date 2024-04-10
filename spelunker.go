@@ -290,6 +290,8 @@ func (s *OpenSearchSpelunker) searchWithIndex(ctx context.Context, req *opensear
 		}
 	}
 
+	// To do: Add timeout code
+	
 	rsp, err := req.Do(ctx, s.client)
 
 	if err != nil {
@@ -320,6 +322,8 @@ func (s *OpenSearchSpelunker) searchWithIndex(ctx context.Context, req *opensear
 
 func (s *OpenSearchSpelunker) searchWithScroll(ctx context.Context, req *opensearchapi.ScrollRequest) ([]byte, error) {
 
+	// To do: Add timeout code
+	
 	rsp, err := req.Do(ctx, s.client)
 
 	if err != nil {
