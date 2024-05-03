@@ -83,7 +83,7 @@ func NewOpenSearchSpelunker(ctx context.Context, uri string) (spelunker.Spelunke
 	return s, nil
 }
 
-func (s *OpenSearchSpelunker) GetRecordForId(ctx context.Context, id int64) ([]byte, error) {
+func (s *OpenSearchSpelunker) GetRecordForId(ctx context.Context, id int64, uri_args *uri.URIArgs) ([]byte, error) {
 
 	q := fmt.Sprintf(`{"query": { "ids": { "values": [ %d ] } } }`, id)
 
@@ -107,6 +107,17 @@ func (s *OpenSearchSpelunker) GetRecordForId(ctx context.Context, id int64) ([]b
 	return []byte(r.String()), nil
 }
 
+func (s *OpenSearchSpelunker) GetSPRForId(ctx context.Context, id int64, uri_args *uri.URIArgs) (wof_spr.StandardPlacesResult, error) {
+
+	r, err := s.GetRecordForId(ctx, id, uri_args)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return NewSpelunkerRecordSPR(r)
+}
+
 func (s *OpenSearchSpelunker) GetFeatureForId(ctx context.Context, id int64, uri_args *uri.URIArgs) ([]byte, error) {
 
 	rel_path, err := uri.Id2RelPath(id, uri_args)
@@ -119,7 +130,7 @@ func (s *OpenSearchSpelunker) GetFeatureForId(ctx context.Context, id int64, uri
 
 	if f_reader == nil {
 
-		record, err := s.GetRecordForId(ctx, id)
+		record, err := s.GetRecordForId(ctx, id, uri_args)
 
 		if err != nil {
 			return nil, err
@@ -291,7 +302,7 @@ func (s *OpenSearchSpelunker) searchWithIndex(ctx context.Context, req *opensear
 	}
 
 	// To do: Add timeout code
-	
+
 	rsp, err := req.Do(ctx, s.client)
 
 	if err != nil {
@@ -323,7 +334,7 @@ func (s *OpenSearchSpelunker) searchWithIndex(ctx context.Context, req *opensear
 func (s *OpenSearchSpelunker) searchWithScroll(ctx context.Context, req *opensearchapi.ScrollRequest) ([]byte, error) {
 
 	// To do: Add timeout code
-	
+
 	rsp, err := req.Do(ctx, s.client)
 
 	if err != nil {
