@@ -1,6 +1,8 @@
 module github.com/whosonfirst/go-whosonfirst-spelunker-opensearch
 
-go 1.22
+go 1.22.1
+
+toolchain go1.22.3
 
 require (
 	github.com/aaronland/go-pagination v0.3.0
@@ -10,38 +12,38 @@ require (
 	github.com/whosonfirst/go-reader v1.0.2
 	github.com/whosonfirst/go-reader-http v0.3.1
 	github.com/whosonfirst/go-whosonfirst-flags v0.5.1
-	github.com/whosonfirst/go-whosonfirst-opensearch v0.0.11
+	github.com/whosonfirst/go-whosonfirst-opensearch v0.0.14
 	github.com/whosonfirst/go-whosonfirst-placetypes v0.7.2
-	github.com/whosonfirst/go-whosonfirst-spelunker v0.0.0-20240402155952-8bcf14040388
-	github.com/whosonfirst/go-whosonfirst-spelunker-httpd v0.0.0-20240403154010-61c207409c22
+	github.com/whosonfirst/go-whosonfirst-spelunker v0.0.0-20240503161612-eef4568c21df
+	github.com/whosonfirst/go-whosonfirst-spelunker-httpd v0.0.0-20240512200647-bc35c4dc20b7
 	github.com/whosonfirst/go-whosonfirst-spr/v2 v2.3.7
 	github.com/whosonfirst/go-whosonfirst-uri v1.3.0
 )
 
 require (
-	github.com/aaronland/go-aws-auth v1.3.1 // indirect
+	github.com/aaronland/go-aws-auth v1.6.1 // indirect
 	github.com/aaronland/go-http-sanitize v0.0.8 // indirect
 	github.com/aaronland/go-http-server v1.4.1 // indirect
 	github.com/aaronland/go-roster v1.0.0 // indirect
 	github.com/akrylysov/algnhsa v1.1.0 // indirect
 	github.com/aws/aws-lambda-go v1.46.0 // indirect
-	github.com/aws/aws-sdk-go-v2 v1.24.1 // indirect
-	github.com/aws/aws-sdk-go-v2/config v1.26.6 // indirect
-	github.com/aws/aws-sdk-go-v2/credentials v1.16.16 // indirect
-	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.14.11 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/configsources v1.2.10 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.5.10 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/ini v1.7.3 // indirect
-	github.com/aws/aws-sdk-go-v2/service/cognitoidentity v1.21.7 // indirect
-	github.com/aws/aws-sdk-go-v2/service/iam v1.28.7 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.10.4 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.10.10 // indirect
-	github.com/aws/aws-sdk-go-v2/service/ssm v1.45.0 // indirect
-	github.com/aws/aws-sdk-go-v2/service/sso v1.18.7 // indirect
-	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.21.7 // indirect
-	github.com/aws/aws-sdk-go-v2/service/sts v1.26.7 // indirect
-	github.com/aws/smithy-go v1.19.0 // indirect
-	github.com/cenkalti/backoff/v4 v4.2.1 // indirect
+	github.com/aws/aws-sdk-go-v2 v1.26.0 // indirect
+	github.com/aws/aws-sdk-go-v2/config v1.27.9 // indirect
+	github.com/aws/aws-sdk-go-v2/credentials v1.17.9 // indirect
+	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.16.0 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/configsources v1.3.4 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.6.4 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/ini v1.8.0 // indirect
+	github.com/aws/aws-sdk-go-v2/service/cognitoidentity v1.23.4 // indirect
+	github.com/aws/aws-sdk-go-v2/service/iam v1.31.3 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.11.1 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.11.6 // indirect
+	github.com/aws/aws-sdk-go-v2/service/ssm v1.49.4 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sso v1.20.3 // indirect
+	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.23.3 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sts v1.28.5 // indirect
+	github.com/aws/smithy-go v1.20.1 // indirect
+	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/dominikbraun/graph v0.23.0 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/go-ini/ini v1.67.0 // indirect
@@ -56,7 +58,7 @@ require (
 	github.com/sfomuseum/go-flags v0.10.0 // indirect
 	github.com/sfomuseum/go-geojsonld v1.0.0 // indirect
 	github.com/sfomuseum/go-http-auth v0.11.0 // indirect
-	github.com/sfomuseum/go-template v1.9.0 // indirect
+	github.com/sfomuseum/go-template v1.10.0 // indirect
 	github.com/sfomuseum/iso8601duration v1.1.0 // indirect
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e // indirect
 	github.com/tidwall/match v1.1.1 // indirect
@@ -69,5 +71,5 @@ require (
 	github.com/whosonfirst/go-whosonfirst-sources v0.2.0 // indirect
 	github.com/whosonfirst/go-whosonfirst-svg v0.1.0 // indirect
 	go.mongodb.org/mongo-driver v1.11.4 // indirect
-	golang.org/x/text v0.14.0 // indirect
+	golang.org/x/text v0.15.0 // indirect
 )

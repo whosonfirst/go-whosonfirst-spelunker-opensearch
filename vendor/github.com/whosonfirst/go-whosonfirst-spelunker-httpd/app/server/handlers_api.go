@@ -10,6 +10,22 @@ import (
 	"github.com/whosonfirst/go-whosonfirst-spelunker-httpd/api"
 )
 
+func findingAidHandlerFunc(ctx context.Context) (http.Handler, error) {
+
+	setupCommonOnce.Do(setupCommon)
+
+	if setupCommonError != nil {
+		slog.Error("Failed to set up common configuration", "error", setupCommonError)
+		return nil, fmt.Errorf("Failed to set up common configuration, %w", setupCommonError)
+	}
+
+	opts := &api.FindingAidHandlerOptions{
+		Spelunker: sp,
+	}
+
+	return api.FindingAidHandler(opts)
+}
+
 func geoJSONHandlerFunc(ctx context.Context) (http.Handler, error) {
 
 	setupCommonOnce.Do(setupCommon)
