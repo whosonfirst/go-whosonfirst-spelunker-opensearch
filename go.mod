@@ -1,15 +1,16 @@
 module github.com/whosonfirst/go-whosonfirst-spelunker-opensearch
 
-go 1.22.1
-
-toolchain go1.22.3
+go 1.22.3
 
 require (
 	github.com/aaronland/go-pagination v0.3.0
 	github.com/opensearch-project/opensearch-go/v2 v2.3.0
 	github.com/sfomuseum/go-edtf v1.1.1
 	github.com/tidwall/gjson v1.17.1
+	github.com/whosonfirst/go-cache v0.5.3
+	github.com/whosonfirst/go-cache-memcache v0.0.1
 	github.com/whosonfirst/go-reader v1.0.2
+	github.com/whosonfirst/go-reader-cachereader v1.1.1
 	github.com/whosonfirst/go-reader-http v0.3.1
 	github.com/whosonfirst/go-whosonfirst-flags v0.5.1
 	github.com/whosonfirst/go-whosonfirst-opensearch v0.0.14
@@ -43,6 +44,7 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.23.3 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sts v1.28.5 // indirect
 	github.com/aws/smithy-go v1.20.1 // indirect
+	github.com/bradfitz/gomemcache v0.0.0-20230905024940-24af94b03874 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/dominikbraun/graph v0.23.0 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
@@ -53,6 +55,7 @@ require (
 	github.com/jtacoma/uritemplates v1.0.0 // indirect
 	github.com/mitchellh/copystructure v1.2.0 // indirect
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
+	github.com/patrickmn/go-cache v2.1.0+incompatible // indirect
 	github.com/paulmach/go.geojson v1.4.0 // indirect
 	github.com/paulmach/orb v0.10.0 // indirect
 	github.com/sfomuseum/go-flags v0.10.0 // indirect

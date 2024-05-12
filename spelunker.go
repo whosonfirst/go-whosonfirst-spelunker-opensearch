@@ -17,7 +17,10 @@ import (
 	opensearch "github.com/opensearch-project/opensearch-go/v2"
 	opensearchapi "github.com/opensearch-project/opensearch-go/v2/opensearchapi"
 	"github.com/tidwall/gjson"
+	"github.com/whosonfirst/go-cache"
+	_ "github.com/whosonfirst/go-cache-memcache"
 	"github.com/whosonfirst/go-reader"
+	"github.com/whosonfirst/go-reader-cachereader"
 	_ "github.com/whosonfirst/go-reader-http"
 	"github.com/whosonfirst/go-whosonfirst-opensearch/client"
 	"github.com/whosonfirst/go-whosonfirst-spelunker"
@@ -33,6 +36,7 @@ type OpenSearchSpelunker struct {
 	client *opensearch.Client
 	index  string
 	reader reader.Reader
+	cache  cache.Cache
 }
 
 func init() {
@@ -67,6 +71,9 @@ func NewOpenSearchSpelunker(ctx context.Context, uri string) (spelunker.Spelunke
 		index:  "spelunker",
 	}
 
+	// If we don't have an explicit reader-uri we defer creating the repo until runtime
+	// when we know what repo a record is part of in order to query GitHub directly.
+
 	if q.Has("reader-uri") {
 
 		reader_uri := q.Get("reader_uri")
@@ -78,6 +85,19 @@ func NewOpenSearchSpelunker(ctx context.Context, uri string) (spelunker.Spelunke
 		}
 
 		s.reader = r
+	}
+
+	if q.Has("cache-uri") {
+
+		cache_uri := q.Get("cache-uri")
+
+		c, err := cache.NewCache(ctx, cache_uri)
+
+		if err != nil {
+			return nil, fmt.Errorf("Failed to create cache, %w", err)
+		}
+
+		s.cache = c
 	}
 
 	return s, nil
@@ -148,14 +168,32 @@ func (s *OpenSearchSpelunker) GetFeatureForId(ctx context.Context, id int64, uri
 		f_reader = r
 	}
 
-	r, err := f_reader.Read(ctx, rel_path)
+	r := f_reader
+
+	if s.cache != nil {
+
+		cr_opts := &cachereader.CacheReaderOptions{
+			Reader: f_reader,
+			Cache:  s.cache,
+		}
+
+		cr, err := cachereader.NewCacheReaderWithOptions(ctx, cr_opts)
+
+		if err != nil {
+			return nil, fmt.Errorf("Failed to create cache reader, %w", err)
+		}
+
+		r = cr
+	}
+
+	rsp, err := r.Read(ctx, rel_path)
 
 	if err != nil {
 		return nil, err
 	}
 
-	defer r.Close()
-	return io.ReadAll(r)
+	defer rsp.Close()
+	return io.ReadAll(rsp)
 }
 
 func (s *OpenSearchSpelunker) facet(ctx context.Context, req *opensearchapi.SearchRequest, facets []*spelunker.Facet) ([]*spelunker.Faceting, error) {

@@ -19,7 +19,7 @@ type SpelunkerRecordSPR struct {
 	// The problem with this is that we can't use it with api/spr.go
 	// endpoint if it is using the Spelunker interface GetSPRWithId
 	// method.
-	
+
 	props []byte
 }
 
