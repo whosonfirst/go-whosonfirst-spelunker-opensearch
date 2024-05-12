@@ -13,6 +13,9 @@ OS_INDEX=/usr/local/whosonfirst/go-whosonfirst-opensearch/bin/wof-opensearch-ind
 # URL escaping, sigh...
 SPELUNKER_URI=opensearch://?dsn=https%3A%2F%2Flocalhost%3A9200%2Fspelunker%3Fusername%3Dadmin%26password%3Ddkjfhsjdkfkjdjhksfhskd98475kjHkzjxckj%26insecure%3Dtrue%26require-tls%3Dtrue
 
+cli:
+	go build -mod $(GOMOD) -ldflags="$(LDFLAGS)" -o bin/wof-spelunker-httpd cmd/httpd/main.go
+
 index:
 	$(OS_INDEX) \
 		-writer-uri 'constant://?val=opensearch2%3A%2F%2Flocalhost%3A9200%2Fspelunker%3Frequire-tls%3Dtrue%26insecure%3Dtrue%26debug%3Dfalse%26username%3Dadmin%26password%3D$(OS_PSWD)' \
