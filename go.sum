@@ -58,8 +58,6 @@ github.com/aws/aws-sdk-go-v2/service/sts v1.28.5/go.mod h1:0ih0Z83YDH/QeQ6Ori2yG
 github.com/aws/smithy-go v1.13.5/go.mod h1:Tg+OJXh4MB2R/uN61Ko2f6hTZwB/ZYGOtib8J3gBHzA=
 github.com/aws/smithy-go v1.20.1 h1:4SZlSlMr36UEqC7XOyRVb27XMeZubNcBNN+9IgEPIQw=
 github.com/aws/smithy-go v1.20.1/go.mod h1:krry+ya/rV9RDcV/Q16kpu6ypI4K2czasz0NC3qS14E=
-github.com/bradfitz/gomemcache v0.0.0-20230905024940-24af94b03874 h1:N7oVaKyGp8bttX0bfZGmcGkjz7DLQXhAn3DNd3T0ous=
-github.com/bradfitz/gomemcache v0.0.0-20230905024940-24af94b03874/go.mod h1:r5xuitiExdLAJ09PR7vBVENGvp4ZuTBeWTGtxuX3K+c=
 github.com/cenkalti/backoff/v4 v4.3.0 h1:MyRJ/UdXutAwSAT+s3wNd7MfTIcy71VQueUuFK343L8=
 github.com/cenkalti/backoff/v4 v4.3.0/go.mod h1:Y3VNntkOUPxTVeUxJ/G5vcM//AlwfmyYozVcomhLiZE=
 github.com/davecgh/go-spew v1.1.0/go.mod h1:J7Y8YcW2NihsgmVo/mv3lAwl/skON4iLHjSsI+c5H38=
@@ -161,8 +159,6 @@ github.com/tidwall/sjson v1.2.5 h1:kLy8mja+1c9jlljvWTlSazM7cKDRfJuR/bOJhcY5NcY=
 github.com/tidwall/sjson v1.2.5/go.mod h1:Fvgq9kS/6ociJEDnK0Fk1cpYF4FIW6ZF7LAe+6jwd28=
 github.com/whosonfirst/go-cache v0.5.3 h1:1onzhg7pFFEDoHdoKPQofNBZtz62cKUv8JSwZ5xePUA=
 github.com/whosonfirst/go-cache v0.5.3/go.mod h1:8y+lZUKB5lbPPGTU8//1OjycyB797Cb5XMC9yuSx1eM=
-github.com/whosonfirst/go-cache-memcache v0.0.1 h1:kKEIP3I/kRnrFnwy4Q1XJ9kYEjfYVWl84PKm/TqC/h4=
-github.com/whosonfirst/go-cache-memcache v0.0.1/go.mod h1:JSAngFjIz6sv7ZQM+3ooqhjNv0tmUzxdKm4B8RhGCV4=
 github.com/whosonfirst/go-geojson-svg v0.0.5 h1:uflMO/4bg2rxbS8uBLCEXw1GWraG1wjQPdAxEzHc4Nc=
 github.com/whosonfirst/go-geojson-svg v0.0.5/go.mod h1:Na/OJXqrHvte6c0+9c3WGiwzti1xgRP4/O/bpo0x+pw=
 github.com/whosonfirst/go-ioutil v1.0.2 h1:+GJPfa42OFn5A+5yJSc5jQTQIkNV3/MhYyg4pavdrC8=

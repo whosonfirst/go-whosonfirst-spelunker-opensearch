@@ -8,7 +8,6 @@ require (
 	github.com/sfomuseum/go-edtf v1.1.1
 	github.com/tidwall/gjson v1.17.1
 	github.com/whosonfirst/go-cache v0.5.3
-	github.com/whosonfirst/go-cache-memcache v0.0.1
 	github.com/whosonfirst/go-reader v1.0.2
 	github.com/whosonfirst/go-reader-cachereader v1.1.1
 	github.com/whosonfirst/go-reader-http v0.3.1
@@ -44,7 +43,6 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.23.3 // indirect
 	github.com/aws/aws-sdk-go-v2/service/sts v1.28.5 // indirect
 	github.com/aws/smithy-go v1.20.1 // indirect
-	github.com/bradfitz/gomemcache v0.0.0-20230905024940-24af94b03874 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
 	github.com/dominikbraun/graph v0.23.0 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
