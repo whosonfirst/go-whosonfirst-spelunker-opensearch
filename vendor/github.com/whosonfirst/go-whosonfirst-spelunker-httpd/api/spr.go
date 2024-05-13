@@ -34,29 +34,29 @@ func SPRHandler(opts *SPRHandlerOptions) (http.Handler, error) {
 		}
 
 		/*
-		spr, err := httpd.SPRFromRequestURI(ctx, opts.Spelunker, req_uri)
-
-		if err != nil {
-			slog.Error("Failed to get by ID", "id", req_uri.Id, "error", err)
-			http.Error(rsp, spelunker.ErrNotFound.Error(), http.StatusNotFound)
-			return
-		}
-		*/
-
-			r, err := httpd.FeatureFromRequestURI(ctx, opts.Spelunker, req_uri)
+			spr, err := httpd.SPRFromRequestURI(ctx, opts.Spelunker, req_uri)
 
 			if err != nil {
 				slog.Error("Failed to get by ID", "id", req_uri.Id, "error", err)
 				http.Error(rsp, spelunker.ErrNotFound.Error(), http.StatusNotFound)
 				return
 			}
+		*/
 
-			s, err := spr.WhosOnFirstSPR(r)
+		r, err := httpd.FeatureFromRequestURI(ctx, opts.Spelunker, req_uri)
 
-			if err != nil {
-				http.Error(rsp, err.Error(), http.StatusInternalServerError)
-				return
-			}
+		if err != nil {
+			slog.Error("Failed to get by ID", "id", req_uri.Id, "error", err)
+			http.Error(rsp, spelunker.ErrNotFound.Error(), http.StatusNotFound)
+			return
+		}
+
+		s, err := spr.WhosOnFirstSPR(r)
+
+		if err != nil {
+			http.Error(rsp, err.Error(), http.StatusInternalServerError)
+			return
+		}
 
 		rsp.Header().Set("Content-Type", "application/json")
 

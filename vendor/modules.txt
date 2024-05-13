@@ -199,6 +199,10 @@ github.com/paulmach/orb/project
 # github.com/pkg/errors v0.9.1
 ## explicit
 github.com/pkg/errors
+# github.com/rs/cors v1.11.0
+## explicit; go 1.13
+github.com/rs/cors
+github.com/rs/cors/internal
 # github.com/sfomuseum/go-edtf v1.1.1
 ## explicit; go 1.12
 github.com/sfomuseum/go-edtf
@@ -290,7 +294,7 @@ github.com/whosonfirst/go-whosonfirst-sources/sources
 ## explicit; go 1.22
 github.com/whosonfirst/go-whosonfirst-spelunker
 github.com/whosonfirst/go-whosonfirst-spelunker/app/cli
-# github.com/whosonfirst/go-whosonfirst-spelunker-httpd v0.0.0-20240512200647-bc35c4dc20b7
+# github.com/whosonfirst/go-whosonfirst-spelunker-httpd v0.0.0-20240513160104-33b42b20429f
 ## explicit; go 1.22
 github.com/whosonfirst/go-whosonfirst-spelunker-httpd
 github.com/whosonfirst/go-whosonfirst-spelunker-httpd/api

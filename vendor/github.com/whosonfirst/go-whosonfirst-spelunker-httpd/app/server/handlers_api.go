@@ -12,75 +12,99 @@ import (
 
 func findingAidHandlerFunc(ctx context.Context) (http.Handler, error) {
 
-	setupCommonOnce.Do(setupCommon)
+	setupAPIOnce.Do(setupAPI)
 
-	if setupCommonError != nil {
-		slog.Error("Failed to set up common configuration", "error", setupCommonError)
-		return nil, fmt.Errorf("Failed to set up common configuration, %w", setupCommonError)
+	if setupAPIError != nil {
+		slog.Error("Failed to set up common configuration", "error", setupAPIError)
+		return nil, fmt.Errorf("Failed to set up common configuration, %w", setupAPIError)
 	}
 
 	opts := &api.FindingAidHandlerOptions{
 		Spelunker: sp,
 	}
 
-	return api.FindingAidHandler(opts)
+	h, err := api.FindingAidHandler(opts)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return cors_wrapper.Handler(h), nil
 }
 
 func geoJSONHandlerFunc(ctx context.Context) (http.Handler, error) {
 
-	setupCommonOnce.Do(setupCommon)
+	setupAPIOnce.Do(setupAPI)
 
-	if setupCommonError != nil {
-		slog.Error("Failed to set up common configuration", "error", setupCommonError)
-		return nil, fmt.Errorf("Failed to set up common configuration, %w", setupCommonError)
+	if setupAPIError != nil {
+		slog.Error("Failed to set up common configuration", "error", setupAPIError)
+		return nil, fmt.Errorf("Failed to set up common configuration, %w", setupAPIError)
 	}
 
 	opts := &api.GeoJSONHandlerOptions{
 		Spelunker: sp,
 	}
 
-	return api.GeoJSONHandler(opts)
+	h, err := api.GeoJSONHandler(opts)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return cors_wrapper.Handler(h), nil
 }
 
 func geoJSONLDHandlerFunc(ctx context.Context) (http.Handler, error) {
 
-	setupCommonOnce.Do(setupCommon)
+	setupAPIOnce.Do(setupAPI)
 
-	if setupCommonError != nil {
-		slog.Error("Failed to set up common configuration", "error", setupCommonError)
-		return nil, fmt.Errorf("Failed to set up common configuration, %w", setupCommonError)
+	if setupAPIError != nil {
+		slog.Error("Failed to set up common configuration", "error", setupAPIError)
+		return nil, fmt.Errorf("Failed to set up common configuration, %w", setupAPIError)
 	}
 
 	opts := &api.GeoJSONLDHandlerOptions{
 		Spelunker: sp,
 	}
 
-	return api.GeoJSONLDHandler(opts)
+	h, err := api.GeoJSONLDHandler(opts)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return cors_wrapper.Handler(h), nil
 }
 
 func sprHandlerFunc(ctx context.Context) (http.Handler, error) {
 
-	setupCommonOnce.Do(setupCommon)
+	setupAPIOnce.Do(setupAPI)
 
-	if setupCommonError != nil {
-		slog.Error("Failed to set up common configuration", "error", setupCommonError)
-		return nil, fmt.Errorf("Failed to set up common configuration, %w", setupCommonError)
+	if setupAPIError != nil {
+		slog.Error("Failed to set up common configuration", "error", setupAPIError)
+		return nil, fmt.Errorf("Failed to set up common configuration, %w", setupAPIError)
 	}
 
 	opts := &api.SPRHandlerOptions{
 		Spelunker: sp,
 	}
 
-	return api.SPRHandler(opts)
+	h, err := api.SPRHandler(opts)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return cors_wrapper.Handler(h), nil
 }
 
 func selectHandlerFunc(ctx context.Context) (http.Handler, error) {
 
-	setupCommonOnce.Do(setupCommon)
+	setupAPIOnce.Do(setupAPI)
 
-	if setupCommonError != nil {
-		slog.Error("Failed to set up common configuration", "error", setupCommonError)
-		return nil, fmt.Errorf("Failed to set up common configuration, %w", setupCommonError)
+	if setupAPIError != nil {
+		slog.Error("Failed to set up common configuration", "error", setupAPIError)
+		return nil, fmt.Errorf("Failed to set up common configuration, %w", setupAPIError)
 	}
 
 	// Make this a config/flag
@@ -98,16 +122,22 @@ func selectHandlerFunc(ctx context.Context) (http.Handler, error) {
 		Spelunker: sp,
 	}
 
-	return api.SelectHandler(opts)
+	h, err := api.SelectHandler(opts)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return cors_wrapper.Handler(h), nil
 }
 
 func navPlaceHandlerFunc(ctx context.Context) (http.Handler, error) {
 
-	setupCommonOnce.Do(setupCommon)
+	setupAPIOnce.Do(setupAPI)
 
-	if setupCommonError != nil {
-		slog.Error("Failed to set up common configuration", "error", setupCommonError)
-		return nil, fmt.Errorf("Failed to set up common configuration, %w", setupCommonError)
+	if setupAPIError != nil {
+		slog.Error("Failed to set up common configuration", "error", setupAPIError)
+		return nil, fmt.Errorf("Failed to set up common configuration, %w", setupAPIError)
 	}
 
 	opts := &api.NavPlaceHandlerOptions{
@@ -115,16 +145,22 @@ func navPlaceHandlerFunc(ctx context.Context) (http.Handler, error) {
 		MaxFeatures: 10,
 	}
 
-	return api.NavPlaceHandler(opts)
+	h, err := api.NavPlaceHandler(opts)
+
+	if err != nil {
+		return nil, err
+	}
+
+	return cors_wrapper.Handler(h), nil
 }
 
 func svgHandlerFunc(ctx context.Context) (http.Handler, error) {
 
-	setupCommonOnce.Do(setupCommon)
+	setupAPIOnce.Do(setupAPI)
 
-	if setupCommonError != nil {
-		slog.Error("Failed to set up common configuration", "error", setupCommonError)
-		return nil, fmt.Errorf("Failed to set up common configuration, %w", setupCommonError)
+	if setupAPIError != nil {
+		slog.Error("Failed to set up common configuration", "error", setupAPIError)
+		return nil, fmt.Errorf("Failed to set up common configuration, %w", setupAPIError)
 	}
 
 	sz := api.DefaultSVGSizes()
@@ -139,11 +175,11 @@ func svgHandlerFunc(ctx context.Context) (http.Handler, error) {
 
 func descendantsFacetedHandlerFunc(ctx context.Context) (http.Handler, error) {
 
-	setupCommonOnce.Do(setupCommon)
+	setupAPIOnce.Do(setupAPI)
 
-	if setupCommonError != nil {
-		slog.Error("Failed to set up common configuration", "error", setupCommonError)
-		return nil, fmt.Errorf("Failed to set up common configuration, %w", setupCommonError)
+	if setupAPIError != nil {
+		slog.Error("Failed to set up common configuration", "error", setupAPIError)
+		return nil, fmt.Errorf("Failed to set up common configuration, %w", setupAPIError)
 	}
 
 	opts := &api.DescendantsFacetedHandlerOptions{
@@ -156,11 +192,11 @@ func descendantsFacetedHandlerFunc(ctx context.Context) (http.Handler, error) {
 
 func placetypeFacetedHandlerFunc(ctx context.Context) (http.Handler, error) {
 
-	setupCommonOnce.Do(setupCommon)
+	setupAPIOnce.Do(setupAPI)
 
-	if setupCommonError != nil {
-		slog.Error("Failed to set up common configuration", "error", setupCommonError)
-		return nil, fmt.Errorf("Failed to set up common configuration, %w", setupCommonError)
+	if setupAPIError != nil {
+		slog.Error("Failed to set up common configuration", "error", setupAPIError)
+		return nil, fmt.Errorf("Failed to set up common configuration, %w", setupAPIError)
 	}
 
 	opts := &api.PlacetypeFacetedHandlerOptions{
@@ -173,11 +209,11 @@ func placetypeFacetedHandlerFunc(ctx context.Context) (http.Handler, error) {
 
 func recentFacetedHandlerFunc(ctx context.Context) (http.Handler, error) {
 
-	setupCommonOnce.Do(setupCommon)
+	setupAPIOnce.Do(setupAPI)
 
-	if setupCommonError != nil {
-		slog.Error("Failed to set up common configuration", "error", setupCommonError)
-		return nil, fmt.Errorf("Failed to set up common configuration, %w", setupCommonError)
+	if setupAPIError != nil {
+		slog.Error("Failed to set up common configuration", "error", setupAPIError)
+		return nil, fmt.Errorf("Failed to set up common configuration, %w", setupAPIError)
 	}
 
 	opts := &api.RecentFacetedHandlerOptions{
@@ -190,11 +226,11 @@ func recentFacetedHandlerFunc(ctx context.Context) (http.Handler, error) {
 
 func hasConcordanceFacetedHandlerFunc(ctx context.Context) (http.Handler, error) {
 
-	setupCommonOnce.Do(setupCommon)
+	setupAPIOnce.Do(setupAPI)
 
-	if setupCommonError != nil {
-		slog.Error("Failed to set up common configuration", "error", setupCommonError)
-		return nil, fmt.Errorf("Failed to set up common configuration, %w", setupCommonError)
+	if setupAPIError != nil {
+		slog.Error("Failed to set up common configuration", "error", setupAPIError)
+		return nil, fmt.Errorf("Failed to set up common configuration, %w", setupAPIError)
 	}
 
 	opts := &api.HasConcordanceFacetedHandlerOptions{
@@ -207,11 +243,11 @@ func hasConcordanceFacetedHandlerFunc(ctx context.Context) (http.Handler, error)
 
 func searchFacetedHandlerFunc(ctx context.Context) (http.Handler, error) {
 
-	setupCommonOnce.Do(setupCommon)
+	setupAPIOnce.Do(setupAPI)
 
-	if setupCommonError != nil {
-		slog.Error("Failed to set up common configuration", "error", setupCommonError)
-		return nil, fmt.Errorf("Failed to set up common configuration, %w", setupCommonError)
+	if setupAPIError != nil {
+		slog.Error("Failed to set up common configuration", "error", setupAPIError)
+		return nil, fmt.Errorf("Failed to set up common configuration, %w", setupAPIError)
 	}
 
 	opts := &api.SearchFacetedHandlerOptions{
@@ -224,11 +260,11 @@ func searchFacetedHandlerFunc(ctx context.Context) (http.Handler, error) {
 
 func nullIslandFacetedHandlerFunc(ctx context.Context) (http.Handler, error) {
 
-	setupCommonOnce.Do(setupCommon)
+	setupAPIOnce.Do(setupAPI)
 
-	if setupCommonError != nil {
-		slog.Error("Failed to set up common configuration", "error", setupCommonError)
-		return nil, fmt.Errorf("Failed to set up common configuration, %w", setupCommonError)
+	if setupAPIError != nil {
+		slog.Error("Failed to set up common configuration", "error", setupAPIError)
+		return nil, fmt.Errorf("Failed to set up common configuration, %w", setupAPIError)
 	}
 
 	opts := &api.NullIslandFacetedHandlerOptions{
