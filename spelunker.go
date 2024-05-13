@@ -18,7 +18,6 @@ import (
 	opensearchapi "github.com/opensearch-project/opensearch-go/v2/opensearchapi"
 	"github.com/tidwall/gjson"
 	"github.com/whosonfirst/go-cache"
-	_ "github.com/whosonfirst/go-cache-memcache"
 	"github.com/whosonfirst/go-reader"
 	"github.com/whosonfirst/go-reader-cachereader"
 	_ "github.com/whosonfirst/go-reader-http"
