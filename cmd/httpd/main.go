@@ -7,6 +7,7 @@ import (
 
 	"github.com/whosonfirst/go-whosonfirst-spelunker-httpd/app/server"
 	_ "github.com/whosonfirst/go-whosonfirst-spelunker-opensearch"
+	_ "github.com/whosonfirst/go-cache-ristretto"
 )
 
 func main() {

@@ -8,6 +8,7 @@ require (
 	github.com/sfomuseum/go-edtf v1.1.1
 	github.com/tidwall/gjson v1.17.1
 	github.com/whosonfirst/go-cache v0.5.3
+	github.com/whosonfirst/go-cache-ristretto v0.0.1
 	github.com/whosonfirst/go-reader v1.0.2
 	github.com/whosonfirst/go-reader-cachereader v1.1.1
 	github.com/whosonfirst/go-reader-http v0.3.1
@@ -44,9 +45,12 @@ require (
 	github.com/aws/aws-sdk-go-v2/service/sts v1.28.5 // indirect
 	github.com/aws/smithy-go v1.20.1 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
+	github.com/cespare/xxhash/v2 v2.1.1 // indirect
+	github.com/dgraph-io/ristretto v0.1.1 // indirect
 	github.com/dominikbraun/graph v0.23.0 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
 	github.com/go-ini/ini v1.67.0 // indirect
+	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b // indirect
 	github.com/hashicorp/errwrap v1.0.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
@@ -56,6 +60,7 @@ require (
 	github.com/patrickmn/go-cache v2.1.0+incompatible // indirect
 	github.com/paulmach/go.geojson v1.4.0 // indirect
 	github.com/paulmach/orb v0.10.0 // indirect
+	github.com/pkg/errors v0.9.1 // indirect
 	github.com/sfomuseum/go-flags v0.10.0 // indirect
 	github.com/sfomuseum/go-geojsonld v1.0.0 // indirect
 	github.com/sfomuseum/go-http-auth v0.11.0 // indirect
@@ -72,5 +77,6 @@ require (
 	github.com/whosonfirst/go-whosonfirst-sources v0.2.0 // indirect
 	github.com/whosonfirst/go-whosonfirst-svg v0.1.0 // indirect
 	go.mongodb.org/mongo-driver v1.11.4 // indirect
+	golang.org/x/sys v0.18.0 // indirect
 	golang.org/x/text v0.15.0 // indirect
 )
