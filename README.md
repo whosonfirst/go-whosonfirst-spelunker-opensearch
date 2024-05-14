@@ -41,7 +41,7 @@ The `wof-opensearch-index` application however expects a [gocloud.dev/runtimevar
 ### server
 
 ```
-$> make server
+$> make server-local
 go run -mod vendor cmd/httpd/main.go \
 		-server-uri http://localhost:8080 \
 		-spelunker-uri 'opensearch://?dsn=https%3A%2F%2Flocalhost%3A9200%2Fspelunker%3Fusername%3Dadmin%26password%3Ddkjfhsjdkfkjdjhksfhskd98475kjHkzjxckj%26insecure%3Dtrue%26require-tls%3Dtrue'
