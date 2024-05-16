@@ -234,7 +234,14 @@ func (s *OpenSearchSpelunker) searchFacetedQuery(search_opts *spelunker.SearchOp
 
 func (s *OpenSearchSpelunker) searchQueryCriteria(search_opts *spelunker.SearchOptions, filters []spelunker.Filter) string {
 
-	q := fmt.Sprintf(`{ "term": { "names_all": "%s" } }`, search_opts.Query)
+	// This is a short-term fix to address these issues:
+	// https://github.com/whosonfirst/go-whosonfirst-spelunker-opensearch/issues/4
+	// https://github.com/whosonfirst/go-whosonfirst-spelunker-httpd/issues/20
+	// In advance of addressing the actual problem:
+	// https://github.com/whosonfirst/whosonfirst-opensearch/issues/2
+	lower_q := strings.ToLower(search_opts.Query)
+	
+	q := fmt.Sprintf(`{ "term": { "names_all": "%s" } }`, lower_q)
 
 	if len(filters) == 0 {
 		return q
