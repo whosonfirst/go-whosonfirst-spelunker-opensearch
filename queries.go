@@ -244,7 +244,7 @@ func (s *OpenSearchSpelunker) searchQueryCriteria(search_opts *spelunker.SearchO
 	// https://github.com/whosonfirst/go-whosonfirst-spelunker-opensearch/issues/6
 	// switch to https://opensearch.org/docs/latest/query-dsl/full-text/query-string/
 	
-	q := fmt.Sprintf(`{ "term": { "names_all": "%s" } }`, lower_q)
+	q := fmt.Sprintf(`{ "term": { "search": "%s" } }`, lower_q)
 
 	if len(filters) == 0 {
 		return q
