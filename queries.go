@@ -240,6 +240,9 @@ func (s *OpenSearchSpelunker) searchQueryCriteria(search_opts *spelunker.SearchO
 	// In advance of addressing the actual problem:
 	// https://github.com/whosonfirst/whosonfirst-opensearch/issues/2
 	lower_q := strings.ToLower(search_opts.Query)
+
+	// https://github.com/whosonfirst/go-whosonfirst-spelunker-opensearch/issues/6
+	// switch to https://opensearch.org/docs/latest/query-dsl/full-text/query-string/
 	
 	q := fmt.Sprintf(`{ "term": { "names_all": "%s" } }`, lower_q)
 
