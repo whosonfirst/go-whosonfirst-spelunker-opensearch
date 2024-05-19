@@ -21,10 +21,10 @@ URLESCAPE=$(shell which urlescape)
 CACHE_URI=ristretto://
 ENC_CACHE_URI=$(shell $(URLESCAPE) $(CACHE_URI))
 
-DSN=https://localhost:9200/spelunker?username=admin&password=dkjfhsjdkfkjdjhksfhskd98475kjHkzjxckj&insecure=true&require-tls=true&cache-uri=$(ENC_CACHE_URI)
+DSN="https://localhost:9200/spelunker?username=admin&password=dkjfhsjdkfkjdjhksfhskd98475kjHkzjxckj&insecure=true&require-tls=true&cache-uri=$(ENC_CACHE_URI)"
 ENC_DSN=$(shell $(URLESCAPE) $(DSN))
 
-SPELUNKER_URI=opensearch://?dsn=$(DSN)
+SPELUNKER_URI=opensearch://?dsn=$(ENC_DSN)
 
 # Opensearch server
 
@@ -62,10 +62,12 @@ spelunker-local-index:
 		-d @-
 
 spelunker-local-fieldlimit:
+	cat $(WHOSONFIRST_OPENSEARCH)/schema/2.x/settings.spelunker.json | \
 	curl -k \
 		-H 'Content-type:application/json' \
-		-XPUT https://admin:$(OS_PSWD)@localhost:9200/spelunker/_settings \
-		-d '{"index.mapping.total_fields.limit": $(FIELD_LIMIT)}'
+		-XPUT \
+		https://admin:$(OS_PSWD)@localhost:9200/spelunker/_settings \
+		-d @-
 
 # Opensearch indexing
 
