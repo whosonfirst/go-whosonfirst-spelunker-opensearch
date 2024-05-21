@@ -16,7 +16,7 @@ require (
 	github.com/whosonfirst/go-whosonfirst-opensearch v0.0.17
 	github.com/whosonfirst/go-whosonfirst-placetypes v0.7.2
 	github.com/whosonfirst/go-whosonfirst-spelunker v0.0.4
-	github.com/whosonfirst/go-whosonfirst-spelunker-httpd v0.0.7
+	github.com/whosonfirst/go-whosonfirst-spelunker-httpd v0.0.8
 	github.com/whosonfirst/go-whosonfirst-spr/v2 v2.3.7
 	github.com/whosonfirst/go-whosonfirst-uri v1.3.0
 )
