@@ -120,7 +120,7 @@ func (s *OpenSearchSpelunker) GetRecordForId(ctx context.Context, id int64, uri_
 	r := gjson.GetBytes(body, "hits.hits.0._source")
 
 	if !r.Exists() {
-		return nil, fmt.Errorf("First hit missing")
+		return nil, fmt.Errorf("First hit missing for ID '%d'", id)
 	}
 
 	return []byte(r.String()), nil
