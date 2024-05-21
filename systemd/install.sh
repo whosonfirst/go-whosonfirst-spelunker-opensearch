@@ -19,6 +19,8 @@ WHOAMI=`realpath $0`
 SYSTEMD=`dirname ${WHOAMI}`
 GO_SPELUNKER=`dirname ${SYSTEMD}`
 
+GOMOD=readonly
+
 USER="spelunker"
 GROUP="spleunker"
 
@@ -32,7 +34,7 @@ fi
 
 cd $GO_SPELUNKER
 
-${GOLANG} build -mod vendor -ldflags="-s -w" -o /usr/local/bin/wof-spelunker-httpd cmd/httpd/main.go
+${GOLANG} build -mod ${GOMOD} -ldflags="-s -w" -o /usr/local/bin/wof-spelunker-httpd cmd/httpd/main.go
 
 for SERVICE in ${SPELUNKER_SERVICE}
 do
