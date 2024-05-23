@@ -16,13 +16,14 @@ require (
 	github.com/whosonfirst/go-whosonfirst-opensearch v0.0.17
 	github.com/whosonfirst/go-whosonfirst-placetypes v0.7.2
 	github.com/whosonfirst/go-whosonfirst-spelunker v0.0.4
-	github.com/whosonfirst/go-whosonfirst-spelunker-httpd v0.0.8
+	github.com/whosonfirst/go-whosonfirst-spelunker-httpd v0.0.9
 	github.com/whosonfirst/go-whosonfirst-spr/v2 v2.3.7
 	github.com/whosonfirst/go-whosonfirst-uri v1.3.0
 )
 
 require (
 	github.com/aaronland/go-aws-auth v1.6.1 // indirect
+	github.com/aaronland/go-http-rewrite v1.1.0 // indirect
 	github.com/aaronland/go-http-sanitize v0.0.8 // indirect
 	github.com/aaronland/go-http-server v1.4.1 // indirect
 	github.com/aaronland/go-roster v1.0.0 // indirect
@@ -65,6 +66,7 @@ require (
 	github.com/sfomuseum/go-flags v0.10.0 // indirect
 	github.com/sfomuseum/go-geojsonld v1.0.0 // indirect
 	github.com/sfomuseum/go-http-auth v0.11.0 // indirect
+	github.com/sfomuseum/go-http-opensearch v0.0.2 // indirect
 	github.com/sfomuseum/go-template v1.10.0 // indirect
 	github.com/sfomuseum/iso8601duration v1.1.0 // indirect
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e // indirect
@@ -78,6 +80,7 @@ require (
 	github.com/whosonfirst/go-whosonfirst-sources v0.2.0 // indirect
 	github.com/whosonfirst/go-whosonfirst-svg v0.1.0 // indirect
 	go.mongodb.org/mongo-driver v1.11.4 // indirect
-	golang.org/x/sys v0.18.0 // indirect
+	golang.org/x/net v0.25.0 // indirect
+	golang.org/x/sys v0.20.0 // indirect
 	golang.org/x/text v0.15.0 // indirect
 )
