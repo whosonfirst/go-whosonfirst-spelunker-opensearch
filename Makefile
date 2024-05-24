@@ -4,7 +4,8 @@ GOMOD=$(shell test -f "go.work" && echo "readonly" || echo "vendor")
 LDFLAG=-s -w
 
 cli:
-	go build -mod $(GOMOD) -ldflags="$(LDFLAGS)" -o bin/wof-spelunker-httpd cmd/httpd/main.go
+	go build -mod $(GOMOD) -ldflags="$(LDFLAGS)" -o bin/wof-spelunker cmd/wof-spelunker/main.go
+	go build -mod $(GOMOD) -ldflags="$(LDFLAGS)" -o bin/wof-spelunker-httpd cmd/wof-spelunker-httpd/main.go
 
 # Targets for running the Spelunker locally
 
@@ -79,7 +80,7 @@ index-local:
 # Spelunker server
 
 server-local:
-	go run -mod $(GOMOD) cmd/httpd/main.go \
+	go run -mod $(GOMOD) cmd/wof-spelunker-httpd/main.go \
 		-server-uri http://localhost:8080 \
 		-spelunker-uri '$(SPELUNKER_URI)' \
 		-protomaps-api-key '$(APIKEY)'
@@ -93,6 +94,6 @@ lambda:
 lambda-server:
 	if test -f bootstrap; then rm -f bootstrap; fi
 	if test -f server.zip; then rm -f server.zip; fi
-	GOARCH=arm64 GOOS=linux go build -mod $(GOMOD) -ldflags="$(LDFLAGS)" -tags lambda.norpc -o bootstrap cmd/httpd/main.go
+	GOARCH=arm64 GOOS=linux go build -mod $(GOMOD) -ldflags="$(LDFLAGS)" -tags lambda.norpc -o bootstrap cmd/wof-spelunker-httpd/main.go
 	zip server.zip bootstrap
 	rm -f bootstrap
