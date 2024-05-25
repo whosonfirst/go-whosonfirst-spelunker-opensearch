@@ -22,10 +22,13 @@ URLESCAPE=$(shell which urlescape)
 CACHE_URI=ristretto://
 ENC_CACHE_URI=$(shell $(URLESCAPE) $(CACHE_URI))
 
-DSN="https://localhost:9200/spelunker?username=admin&password=dkjfhsjdkfkjdjhksfhskd98475kjHkzjxckj&insecure=true&require-tls=true&cache-uri=$(ENC_CACHE_URI)"
+READER_URI=https://data.whosonfirs.org
+ENC_READER_URI=$(shell $(URLESCAPE) $(READER_URI))
+
+DSN="https://localhost:9200/spelunker?username=admin&password=dkjfhsjdkfkjdjhksfhskd98475kjHkzjxckj&insecure=true&require-tls=true"
 ENC_DSN=$(shell $(URLESCAPE) $(DSN))
 
-SPELUNKER_URI=opensearch://?dsn=$(ENC_DSN)
+SPELUNKER_URI=opensearch://?dsn=$(ENC_DSN)&cache-uri=$(ENC_CACHE_URI)&reader-uri=$(ENC_READER_URI)
 
 # Opensearch server
 
@@ -80,7 +83,8 @@ index-local:
 # Spelunker server
 
 server-local:
-	go run -mod $(GOMOD) cmd/wof-spelunker-httpd/main.go \
+	@make cli
+	./bin/wof-spelunker-httpd \
 		-server-uri http://localhost:8080 \
 		-spelunker-uri '$(SPELUNKER_URI)' \
 		-protomaps-api-key '$(APIKEY)'

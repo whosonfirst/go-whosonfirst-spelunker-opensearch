@@ -75,7 +75,7 @@ func NewOpenSearchSpelunker(ctx context.Context, uri string) (spelunker.Spelunke
 
 	if q.Has("reader-uri") {
 
-		reader_uri := q.Get("reader_uri")
+		reader_uri := q.Get("reader-uri")
 
 		r, err := reader.NewReader(ctx, reader_uri)
 
