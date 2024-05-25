@@ -304,6 +304,8 @@ func (s *OpenSearchSpelunker) facetsToAggregations(facets []*spelunker.Facet) st
 			facet_field = "mz:is_deprecated"
 		case "iscurrent":
 			facet_field = "mz:is_current"
+		case "placetypealt":
+			facet_field = "wof:placetype_alt"
 		default:
 			facet_field = fmt.Sprintf("wof:%s", f)
 		}
@@ -321,8 +323,8 @@ func (s *OpenSearchSpelunker) mustQueryWithFiltersCriteria(must []string, filter
 		switch f.Scheme() {
 		case "placetype":
 			must = append(must, fmt.Sprintf(`{ "term": { "wof:placetype": "%s" } }`, f.Value()))
-		case "placetype-alt":
-			must = append(must, fmt.Sprintf(`{ "term": { "wof:placetype_alt": "%s" } }`, f.Value()))			
+		case "placetypealt":
+			must = append(must, fmt.Sprintf(`{ "term": { "wof:placetype_alt": "%s" } }`, f.Value()))
 		case "country":
 			must = append(must, fmt.Sprintf(`{ "term": { "wof:country": "%s" } }`, f.Value()))
 		case "iscurrent":

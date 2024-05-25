@@ -13,7 +13,7 @@ import (
 
 func (s *OpenSearchSpelunker) GetAlternatePlacetypes(ctx context.Context) (*spelunker.Faceting, error) {
 
-	pt_facet := spelunker.NewFacet("placetype_alt")
+	pt_facet := spelunker.NewFacet("placetypealt")
 
 	facets := []*spelunker.Facet{
 		pt_facet,
