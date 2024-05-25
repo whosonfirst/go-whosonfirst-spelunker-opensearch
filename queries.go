@@ -321,7 +321,7 @@ func (s *OpenSearchSpelunker) mustQueryWithFiltersCriteria(must []string, filter
 		switch f.Scheme() {
 		case "placetype":
 			must = append(must, fmt.Sprintf(`{ "term": { "wof:placetype": "%s" } }`, f.Value()))
-		case "placetype_alt":
+		case "placetype-alt":
 			must = append(must, fmt.Sprintf(`{ "term": { "wof:placetype_alt": "%s" } }`, f.Value()))			
 		case "country":
 			must = append(must, fmt.Sprintf(`{ "term": { "wof:country": "%s" } }`, f.Value()))
