@@ -65,9 +65,24 @@ func NewOpenSearchSpelunker(ctx context.Context, uri string) (spelunker.Spelunke
 		return nil, fmt.Errorf("Failed to create opensearch client, %w", err)
 	}
 
+	dsn_u, err := url.Parse(dsn)
+
+	if err != nil {
+		return nil, fmt.Errorf("Failed to parse dsn (%s), %w", dsn, err)
+	}
+
+	index := dsn_u.Path
+	index = strings.TrimLeft(index, "/")
+
+	if index == "" {
+		return nil, fmt.Errorf("dsn is missing ?index= parameter, '%s'", dsn)
+	}
+
+	slog.Info("DEBUG", "index", index)
+
 	s := &OpenSearchSpelunker{
 		client: cl,
-		index:  "spelunker",
+		index:  index,
 	}
 
 	// If we don't have an explicit reader-uri we defer creating the repo until runtime

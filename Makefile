@@ -1,11 +1,14 @@
 CWD=$(shell pwd)
 
 GOMOD=$(shell test -f "go.work" && echo "readonly" || echo "vendor")
-LDFLAG=-s -w
+LDFLAGS=-s -w
 
 cli:
 	go build -mod $(GOMOD) -ldflags="$(LDFLAGS)" -o bin/wof-spelunker cmd/wof-spelunker/main.go
 	go build -mod $(GOMOD) -ldflags="$(LDFLAGS)" -o bin/wof-spelunker-httpd cmd/wof-spelunker-httpd/main.go
+
+server-linux:
+	GOOS=linux GOARCH=amd64	go build -mod $(GOMOD) -ldflags="$(LDFLAGS)" -o work/wof-spelunker-httpd cmd/wof-spelunker-httpd/main.go
 
 # Targets for running the Spelunker locally
 
