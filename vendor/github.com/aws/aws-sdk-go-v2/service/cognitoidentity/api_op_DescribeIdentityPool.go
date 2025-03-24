@@ -12,8 +12,9 @@ import (
 )
 
 // Gets details about a particular identity pool, including the pool name, ID
-// description, creation date, and current number of users. You must use AWS
-// Developer credentials to call this API.
+// description, creation date, and current number of users.
+//
+// You must use AWS Developer credentials to call this API.
 func (c *Client) DescribeIdentityPool(ctx context.Context, params *DescribeIdentityPoolInput, optFns ...func(*Options)) (*DescribeIdentityPoolOutput, error) {
 	if params == nil {
 		params = &DescribeIdentityPoolInput{}
@@ -59,8 +60,9 @@ type DescribeIdentityPoolOutput struct {
 	IdentityPoolName *string
 
 	// Enables or disables the Basic (Classic) authentication flow. For more
-	// information, see Identity Pools (Federated Identities) Authentication Flow (https://docs.aws.amazon.com/cognito/latest/developerguide/authentication-flow.html)
-	// in the Amazon Cognito Developer Guide.
+	// information, see [Identity Pools (Federated Identities) Authentication Flow]in the Amazon Cognito Developer Guide.
+	//
+	// [Identity Pools (Federated Identities) Authentication Flow]: https://docs.aws.amazon.com/cognito/latest/developerguide/authentication-flow.html
 	AllowClassicFlow *bool
 
 	// A list representing an Amazon Cognito user pool and its client ID.
@@ -133,6 +135,9 @@ func (c *Client) addOperationDescribeIdentityPoolMiddlewares(stack *middleware.S
 	if err = addRecordResponseTiming(stack); err != nil {
 		return err
 	}
+	if err = addSpanRetryLoop(stack, options); err != nil {
+		return err
+	}
 	if err = addClientUserAgent(stack, options); err != nil {
 		return err
 	}
@@ -143,6 +148,12 @@ func (c *Client) addOperationDescribeIdentityPoolMiddlewares(stack *middleware.S
 		return err
 	}
 	if err = addSetLegacyContextSigningOptionsMiddleware(stack); err != nil {
+		return err
+	}
+	if err = addTimeOffsetBuild(stack, c); err != nil {
+		return err
+	}
+	if err = addUserAgentRetryMode(stack, options); err != nil {
 		return err
 	}
 	if err = addOpDescribeIdentityPoolValidationMiddleware(stack); err != nil {
@@ -164,6 +175,18 @@ func (c *Client) addOperationDescribeIdentityPoolMiddlewares(stack *middleware.S
 		return err
 	}
 	if err = addDisableHTTPSMiddleware(stack, options); err != nil {
+		return err
+	}
+	if err = addSpanInitializeStart(stack); err != nil {
+		return err
+	}
+	if err = addSpanInitializeEnd(stack); err != nil {
+		return err
+	}
+	if err = addSpanBuildRequestStart(stack); err != nil {
+		return err
+	}
+	if err = addSpanBuildRequestEnd(stack); err != nil {
 		return err
 	}
 	return nil

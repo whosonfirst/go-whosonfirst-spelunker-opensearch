@@ -11,8 +11,10 @@ import (
 )
 
 // Updates the metadata document for an existing SAML provider resource object.
-// This operation requires Signature Version 4 (https://docs.aws.amazon.com/general/latest/gr/signature-version-4.html)
-// .
+//
+// This operation requires [Signature Version 4].
+//
+// [Signature Version 4]: https://docs.aws.amazon.com/general/latest/gr/signature-version-4.html
 func (c *Client) UpdateSAMLProvider(ctx context.Context, params *UpdateSAMLProviderInput, optFns ...func(*Options)) (*UpdateSAMLProviderOutput, error) {
 	if params == nil {
 		params = &UpdateSAMLProviderInput{}
@@ -39,9 +41,12 @@ type UpdateSAMLProviderInput struct {
 	// This member is required.
 	SAMLMetadataDocument *string
 
-	// The Amazon Resource Name (ARN) of the SAML provider to update. For more
-	// information about ARNs, see Amazon Resource Names (ARNs) (https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html)
-	// in the Amazon Web Services General Reference.
+	// The Amazon Resource Name (ARN) of the SAML provider to update.
+	//
+	// For more information about ARNs, see [Amazon Resource Names (ARNs)] in the Amazon Web Services General
+	// Reference.
+	//
+	// [Amazon Resource Names (ARNs)]: https://docs.aws.amazon.com/general/latest/gr/aws-arns-and-namespaces.html
 	//
 	// This member is required.
 	SAMLProviderArn *string
@@ -104,6 +109,9 @@ func (c *Client) addOperationUpdateSAMLProviderMiddlewares(stack *middleware.Sta
 	if err = addRecordResponseTiming(stack); err != nil {
 		return err
 	}
+	if err = addSpanRetryLoop(stack, options); err != nil {
+		return err
+	}
 	if err = addClientUserAgent(stack, options); err != nil {
 		return err
 	}
@@ -114,6 +122,12 @@ func (c *Client) addOperationUpdateSAMLProviderMiddlewares(stack *middleware.Sta
 		return err
 	}
 	if err = addSetLegacyContextSigningOptionsMiddleware(stack); err != nil {
+		return err
+	}
+	if err = addTimeOffsetBuild(stack, c); err != nil {
+		return err
+	}
+	if err = addUserAgentRetryMode(stack, options); err != nil {
 		return err
 	}
 	if err = addOpUpdateSAMLProviderValidationMiddleware(stack); err != nil {
@@ -135,6 +149,18 @@ func (c *Client) addOperationUpdateSAMLProviderMiddlewares(stack *middleware.Sta
 		return err
 	}
 	if err = addDisableHTTPSMiddleware(stack, options); err != nil {
+		return err
+	}
+	if err = addSpanInitializeStart(stack); err != nil {
+		return err
+	}
+	if err = addSpanInitializeEnd(stack); err != nil {
+		return err
+	}
+	if err = addSpanBuildRequestStart(stack); err != nil {
+		return err
+	}
+	if err = addSpanBuildRequestEnd(stack); err != nil {
 		return err
 	}
 	return nil

@@ -11,8 +11,9 @@ import (
 	smithyhttp "github.com/aws/smithy-go/transport/http"
 )
 
-// Lists the identities in an identity pool. You must use AWS Developer
-// credentials to call this API.
+// Lists the identities in an identity pool.
+//
+// You must use AWS Developer credentials to call this API.
 func (c *Client) ListIdentities(ctx context.Context, params *ListIdentitiesInput, optFns ...func(*Options)) (*ListIdentitiesOutput, error) {
 	if params == nil {
 		params = &ListIdentitiesInput{}
@@ -113,6 +114,9 @@ func (c *Client) addOperationListIdentitiesMiddlewares(stack *middleware.Stack, 
 	if err = addRecordResponseTiming(stack); err != nil {
 		return err
 	}
+	if err = addSpanRetryLoop(stack, options); err != nil {
+		return err
+	}
 	if err = addClientUserAgent(stack, options); err != nil {
 		return err
 	}
@@ -123,6 +127,12 @@ func (c *Client) addOperationListIdentitiesMiddlewares(stack *middleware.Stack, 
 		return err
 	}
 	if err = addSetLegacyContextSigningOptionsMiddleware(stack); err != nil {
+		return err
+	}
+	if err = addTimeOffsetBuild(stack, c); err != nil {
+		return err
+	}
+	if err = addUserAgentRetryMode(stack, options); err != nil {
 		return err
 	}
 	if err = addOpListIdentitiesValidationMiddleware(stack); err != nil {
@@ -144,6 +154,18 @@ func (c *Client) addOperationListIdentitiesMiddlewares(stack *middleware.Stack, 
 		return err
 	}
 	if err = addDisableHTTPSMiddleware(stack, options); err != nil {
+		return err
+	}
+	if err = addSpanInitializeStart(stack); err != nil {
+		return err
+	}
+	if err = addSpanInitializeEnd(stack); err != nil {
+		return err
+	}
+	if err = addSpanBuildRequestStart(stack); err != nil {
+		return err
+	}
+	if err = addSpanBuildRequestEnd(stack); err != nil {
 		return err
 	}
 	return nil
