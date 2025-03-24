@@ -144,14 +144,14 @@ github.com/aws/smithy-go/waiter
 # github.com/cenkalti/backoff/v4 v4.3.0
 ## explicit; go 1.18
 github.com/cenkalti/backoff/v4
-# github.com/cespare/xxhash/v2 v2.1.1
+# github.com/cespare/xxhash/v2 v2.3.0
 ## explicit; go 1.11
 github.com/cespare/xxhash/v2
-# github.com/dgraph-io/ristretto v0.1.1
-## explicit; go 1.12
-github.com/dgraph-io/ristretto
-github.com/dgraph-io/ristretto/z
-github.com/dgraph-io/ristretto/z/simd
+# github.com/dgraph-io/ristretto/v2 v2.1.0
+## explicit; go 1.21
+github.com/dgraph-io/ristretto/v2
+github.com/dgraph-io/ristretto/v2/z
+github.com/dgraph-io/ristretto/v2/z/simd
 # github.com/dominikbraun/graph v0.23.0
 ## explicit; go 1.18
 github.com/dominikbraun/graph
@@ -162,9 +162,6 @@ github.com/dustin/go-humanize
 # github.com/go-ini/ini v1.67.0
 ## explicit
 github.com/go-ini/ini
-# github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b
-## explicit
-github.com/golang/glog
 # github.com/hashicorp/errwrap v1.0.0
 ## explicit
 github.com/hashicorp/errwrap
@@ -261,8 +258,8 @@ github.com/tidwall/sjson
 # github.com/whosonfirst/go-cache v0.5.3
 ## explicit; go 1.22
 github.com/whosonfirst/go-cache
-# github.com/whosonfirst/go-cache-ristretto v0.0.1
-## explicit; go 1.22.3
+# github.com/whosonfirst/go-cache-ristretto v0.0.2
+## explicit; go 1.22
 github.com/whosonfirst/go-cache-ristretto
 # github.com/whosonfirst/go-geojson-svg v0.0.5
 ## explicit; go 1.16
