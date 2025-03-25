@@ -2,6 +2,7 @@ package opensearch
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"log/slog"
@@ -15,7 +16,6 @@ import (
 	"github.com/aaronland/go-pagination"
 	"github.com/aaronland/go-pagination/countable"
 	"github.com/aaronland/go-pagination/cursor"
-	// opensearch "github.com/opensearch-project/opensearch-go/v4"
 	opensearchapi "github.com/opensearch-project/opensearch-go/v4/opensearchapi"
 	"github.com/tidwall/gjson"
 	"github.com/whosonfirst/go-cache"
@@ -292,9 +292,9 @@ func (s *OpenSearchSpelunker) searchPaginated(ctx context.Context, pg_opts pagin
 		scroll_id = strings.TrimLeft(scroll_id, "after-")
 		q = fmt.Sprintf(`{"scroll_id": "%s"}`, scroll_id)
 
-		req := &opensearchapi.ScrollRequest{
-			Body: strings.NewReader(q),
-			Params: opensearchapi.SearchParams{
+		req := &opensearchapi.ScrollGetReq{
+			// Body: strings.NewReader(q),
+			Params: opensearchapi.ScrollGetParams{
 				ScrollID: scroll_id,
 				Scroll:   scroll_duration,
 			},
@@ -350,56 +350,68 @@ func (s *OpenSearchSpelunker) searchWithIndex(ctx context.Context, req *opensear
 
 	// https://pkg.go.dev/github.com/opensearch-project/opensearch-go/v4/opensearchapi#SearchResp
 
-	defer rsp.Body.Close()
+	// This is not ideal but need to test that the current v4-isms actually work
+	// before changing all the internals to accept a SearchResp
+	return json.Marshal(rsp)
 
-	if rsp.StatusCode != 200 {
+	/*
+		defer rsp.Body.Close()
 
-		body, _ := io.ReadAll(rsp.Body)
-		slog.Error(string(body))
+		if rsp.StatusCode != 200 {
 
-		slog.Error("Query failed", "status", rsp.StatusCode)
-		return nil, fmt.Errorf("Invalid status")
-	}
+			body, _ := io.ReadAll(rsp.Body)
+			slog.Error(string(body))
 
-	body, err := io.ReadAll(rsp.Body)
+			slog.Error("Query failed", "status", rsp.StatusCode)
+			return nil, fmt.Errorf("Invalid status")
+		}
 
-	if err != nil {
-		return nil, fmt.Errorf("Failed to read response, %w", err)
-	}
+		body, err := io.ReadAll(rsp.Body)
 
-	return body, nil
+		if err != nil {
+			return nil, fmt.Errorf("Failed to read response, %w", err)
+		}
+
+		return body, nil
+	*/
 }
 
-func (s *OpenSearchSpelunker) searchWithScroll(ctx context.Context, req *opensearchapi.ScrollReq) ([]byte, error) {
+func (s *OpenSearchSpelunker) searchWithScroll(ctx context.Context, req *opensearchapi.ScrollGetReq) ([]byte, error) {
 
 	// To do: Add timeout code
 
-	rsp, err := req.Do(ctx, s.client)
+	rsp, err := s.client.Scroll.Get(ctx, *req)
 
 	if err != nil {
 		return nil, fmt.Errorf("Failed to execute search, %w", err)
 	}
 
-	defer rsp.Body.Close()
+	// This is not ideal but need to test that the current v4-isms actually work
+	// before changing all the internals to accept a ScrollGetResp
+	return json.Marshal(rsp)
 
-	// To do: Check for expired cursor...
+	/*
+		defer rsp.Body.Close()
 
-	if rsp.StatusCode != 200 {
+		// To do: Check for expired cursor...
 
-		// body, _ := io.ReadAll(rsp.Body)
-		// slog.Error(string(body))
+		if rsp.StatusCode != 200 {
 
-		slog.Error("Query failed", "status", rsp.StatusCode)
-		return nil, fmt.Errorf("Invalid status")
-	}
+			// body, _ := io.ReadAll(rsp.Body)
+			// slog.Error(string(body))
 
-	body, err := io.ReadAll(rsp.Body)
+			slog.Error("Query failed", "status", rsp.StatusCode)
+			return nil, fmt.Errorf("Invalid status")
+		}
 
-	if err != nil {
-		return nil, fmt.Errorf("Failed to read response, %w", err)
-	}
+		body, err := io.ReadAll(rsp.Body)
 
-	return body, nil
+		if err != nil {
+			return nil, fmt.Errorf("Failed to read response, %w", err)
+		}
+
+		return body, nil
+	*/
 }
 
 func (s *OpenSearchSpelunker) propsToGeoJSON(props []byte) []byte {
