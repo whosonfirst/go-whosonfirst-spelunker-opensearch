@@ -21,7 +21,7 @@ func (s *OpenSearchSpelunker) GetDescendantsFaceted(ctx context.Context, id int6
 	q := s.descendantsFacetedQuery(id, filters, facets)
 	sz := 0
 
-	req := &opensearchapi.SearchRequest{
+	req := &opensearchapi.SearchReq{
 		Body: strings.NewReader(q),
 		Size: &sz,
 	}
