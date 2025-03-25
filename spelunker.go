@@ -15,7 +15,7 @@ import (
 	"github.com/aaronland/go-pagination"
 	"github.com/aaronland/go-pagination/countable"
 	"github.com/aaronland/go-pagination/cursor"
-	opensearch "github.com/opensearch-project/opensearch-go/v4"
+	// opensearch "github.com/opensearch-project/opensearch-go/v4"
 	opensearchapi "github.com/opensearch-project/opensearch-go/v4/opensearchapi"
 	"github.com/tidwall/gjson"
 	"github.com/whosonfirst/go-cache"
@@ -293,9 +293,11 @@ func (s *OpenSearchSpelunker) searchPaginated(ctx context.Context, pg_opts pagin
 		q = fmt.Sprintf(`{"scroll_id": "%s"}`, scroll_id)
 
 		req := &opensearchapi.ScrollRequest{
-			Body:     strings.NewReader(q),
-			ScrollID: scroll_id,
-			Scroll:   scroll_duration,
+			Body: strings.NewReader(q),
+			Params: opensearchapi.SearchParams{
+				ScrollID: scroll_id,
+				Scroll:   scroll_duration,
+			},
 		}
 
 		body, err = s.searchWithScroll(ctx, req)
@@ -308,12 +310,14 @@ func (s *OpenSearchSpelunker) searchPaginated(ctx context.Context, pg_opts pagin
 
 		req := &opensearchapi.SearchReq{
 			Body: strings.NewReader(q),
-			Size: &sz,
-			From: &from,
+			Params: opensearchapi.SearchParams{
+				Size: &sz,
+				From: &from,
+			},
 		}
 
 		if use_scroll {
-			req.Scroll = scroll_duration
+			req.Params.Scroll = scroll_duration
 		}
 
 		body, err = s.searchWithIndex(ctx, req)
@@ -330,19 +334,21 @@ func (s *OpenSearchSpelunker) searchPaginated(ctx context.Context, pg_opts pagin
 
 func (s *OpenSearchSpelunker) searchWithIndex(ctx context.Context, req *opensearchapi.SearchReq) ([]byte, error) {
 
-	if len(req.Index) == 0 {
-		req.Index = []string{
+	if len(req.Indices) == 0 {
+		req.Indices = []string{
 			s.index,
 		}
 	}
 
 	// To do: Add timeout code
 
-	rsp, err := req.Do(ctx, s.client)
+	rsp, err := s.client.Search(ctx, req)
 
 	if err != nil {
 		return nil, fmt.Errorf("Failed to execute search, %w", err)
 	}
+
+	// https://pkg.go.dev/github.com/opensearch-project/opensearch-go/v4/opensearchapi#SearchResp
 
 	defer rsp.Body.Close()
 
@@ -416,7 +422,9 @@ func (s *OpenSearchSpelunker) countForQuery(ctx context.Context, q string) (int6
 
 	req := &opensearchapi.SearchReq{
 		Body: strings.NewReader(q),
-		Size: &sz,
+		Params: opensearchapi.SearchParams{
+			Size: &sz,
+		},
 	}
 
 	body, err := s.searchWithIndex(ctx, req)

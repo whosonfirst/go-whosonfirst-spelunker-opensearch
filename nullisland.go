@@ -23,7 +23,9 @@ func (s *OpenSearchSpelunker) VisitingNullIslandFaceted(ctx context.Context, fil
 
 	req := &opensearchapi.SearchReq{
 		Body: strings.NewReader(q),
-		Size: &sz,
+		Params: opensearchapi.SearchParams{
+			Size: &sz,
+		},
 	}
 
 	return s.facet(ctx, req, facets)
