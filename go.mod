@@ -13,7 +13,7 @@ require (
 	github.com/whosonfirst/go-reader-cachereader v1.1.1
 	github.com/whosonfirst/go-reader-http v0.3.1
 	github.com/whosonfirst/go-whosonfirst-flags v0.5.2
-	github.com/whosonfirst/go-whosonfirst-opensearch/v4 v4.2.1
+	github.com/whosonfirst/go-whosonfirst-opensearch/v4 v4.2.2
 	github.com/whosonfirst/go-whosonfirst-placetypes v0.7.3
 	github.com/whosonfirst/go-whosonfirst-spelunker v0.0.6
 	github.com/whosonfirst/go-whosonfirst-spelunker-httpd v0.0.16

@@ -34,6 +34,8 @@ Note the unfortunate need to URL escape the `-writer-uri=constant://?val=` param
 opensearch2://localhost:9200/spelunker?require-tls=true&insecure=true&debug=false&username=admin&password=s33kret
 ```
 
+_Note: `opensearch2://` refers to the `whosonfirst/go-whosonfirst-opensearch.OpensearchV2Writer` instance. The "V2" references version 2.x of the OpenSearch software where all the `v4`-isms in this package reference the "opensearch-go/v4" package. I also find it confusing._
+
 The `wof-opensearch-index` application however expects a [gocloud.dev/runtimevar](https://gocloud.dev/howto/runtimevar/) URI so that you don't need to deply production configuration values with sensitive values (like OpenSearch admin passwords) exposed in them. Under the hood the `wof-opensearch-index` application is using the [sfomuseum/runtimevar](https://github.com/sfomuseum/runtimevar) package to manage the details and this needs to be updated to allow plain (non-runtimevar) strings. Or maybe the `wof-opensearch-index` application needs to be updated. Either way something needs to be updated to avoid the hassle of always needing to URL-escape things.
 
 ## Tools
