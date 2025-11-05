@@ -11,8 +11,9 @@ import (
 	smithyhttp "github.com/aws/smithy-go/transport/http"
 )
 
-// Lists all of the Cognito identity pools registered for your account. You must
-// use AWS Developer credentials to call this API.
+// Lists all of the Cognito identity pools registered for your account.
+//
+// You must use Amazon Web Services developer credentials to call this operation.
 func (c *Client) ListIdentityPools(ctx context.Context, params *ListIdentityPoolsInput, optFns ...func(*Options)) (*ListIdentityPoolsOutput, error) {
 	if params == nil {
 		params = &ListIdentityPoolsInput{}
@@ -100,6 +101,9 @@ func (c *Client) addOperationListIdentityPoolsMiddlewares(stack *middleware.Stac
 	if err = addRecordResponseTiming(stack); err != nil {
 		return err
 	}
+	if err = addSpanRetryLoop(stack, options); err != nil {
+		return err
+	}
 	if err = addClientUserAgent(stack, options); err != nil {
 		return err
 	}
@@ -110,6 +114,15 @@ func (c *Client) addOperationListIdentityPoolsMiddlewares(stack *middleware.Stac
 		return err
 	}
 	if err = addSetLegacyContextSigningOptionsMiddleware(stack); err != nil {
+		return err
+	}
+	if err = addTimeOffsetBuild(stack, c); err != nil {
+		return err
+	}
+	if err = addUserAgentRetryMode(stack, options); err != nil {
+		return err
+	}
+	if err = addCredentialSource(stack, options); err != nil {
 		return err
 	}
 	if err = addOpListIdentityPoolsValidationMiddleware(stack); err != nil {
@@ -133,16 +146,50 @@ func (c *Client) addOperationListIdentityPoolsMiddlewares(stack *middleware.Stac
 	if err = addDisableHTTPSMiddleware(stack, options); err != nil {
 		return err
 	}
+	if err = addInterceptBeforeRetryLoop(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptAttempt(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptExecution(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptBeforeSerialization(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptAfterSerialization(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptBeforeSigning(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptAfterSigning(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptTransmit(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptBeforeDeserialization(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptAfterDeserialization(stack, options); err != nil {
+		return err
+	}
+	if err = addSpanInitializeStart(stack); err != nil {
+		return err
+	}
+	if err = addSpanInitializeEnd(stack); err != nil {
+		return err
+	}
+	if err = addSpanBuildRequestStart(stack); err != nil {
+		return err
+	}
+	if err = addSpanBuildRequestEnd(stack); err != nil {
+		return err
+	}
 	return nil
 }
-
-// ListIdentityPoolsAPIClient is a client that implements the ListIdentityPools
-// operation.
-type ListIdentityPoolsAPIClient interface {
-	ListIdentityPools(context.Context, *ListIdentityPoolsInput, ...func(*Options)) (*ListIdentityPoolsOutput, error)
-}
-
-var _ ListIdentityPoolsAPIClient = (*Client)(nil)
 
 // ListIdentityPoolsPaginatorOptions is the paginator options for ListIdentityPools
 type ListIdentityPoolsPaginatorOptions struct {
@@ -207,6 +254,9 @@ func (p *ListIdentityPoolsPaginator) NextPage(ctx context.Context, optFns ...fun
 	}
 	params.MaxResults = limit
 
+	optFns = append([]func(*Options){
+		addIsPaginatorUserAgent,
+	}, optFns...)
 	result, err := p.client.ListIdentityPools(ctx, &params, optFns...)
 	if err != nil {
 		return nil, err
@@ -225,6 +275,14 @@ func (p *ListIdentityPoolsPaginator) NextPage(ctx context.Context, optFns ...fun
 
 	return result, nil
 }
+
+// ListIdentityPoolsAPIClient is a client that implements the ListIdentityPools
+// operation.
+type ListIdentityPoolsAPIClient interface {
+	ListIdentityPools(context.Context, *ListIdentityPoolsInput, ...func(*Options)) (*ListIdentityPoolsOutput, error)
+}
+
+var _ ListIdentityPoolsAPIClient = (*Client)(nil)
 
 func newServiceMetadataMiddleware_opListIdentityPools(region string) *awsmiddleware.RegisterServiceMetadata {
 	return &awsmiddleware.RegisterServiceMetadata{

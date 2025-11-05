@@ -11,10 +11,12 @@ import (
 )
 
 // Gets an OpenID token, using a known Cognito ID. This known Cognito ID is
-// returned by GetId . You can optionally add additional logins for the identity.
-// Supplying multiple logins creates an implicit link. The OpenID token is valid
-// for 10 minutes. This is a public API. You do not need any credentials to call
-// this API.
+// returned by GetId. You can optionally add additional logins for the identity.
+// Supplying multiple logins creates an implicit link.
+//
+// The OpenID token is valid for 10 minutes.
+//
+// This is a public API. You do not need any credentials to call this API.
 func (c *Client) GetOpenIdToken(ctx context.Context, params *GetOpenIdTokenInput, optFns ...func(*Options)) (*GetOpenIdTokenOutput, error) {
 	if params == nil {
 		params = &GetOpenIdTokenInput{}
@@ -104,6 +106,9 @@ func (c *Client) addOperationGetOpenIdTokenMiddlewares(stack *middleware.Stack, 
 	if err = addRecordResponseTiming(stack); err != nil {
 		return err
 	}
+	if err = addSpanRetryLoop(stack, options); err != nil {
+		return err
+	}
 	if err = addClientUserAgent(stack, options); err != nil {
 		return err
 	}
@@ -114,6 +119,15 @@ func (c *Client) addOperationGetOpenIdTokenMiddlewares(stack *middleware.Stack, 
 		return err
 	}
 	if err = addSetLegacyContextSigningOptionsMiddleware(stack); err != nil {
+		return err
+	}
+	if err = addTimeOffsetBuild(stack, c); err != nil {
+		return err
+	}
+	if err = addUserAgentRetryMode(stack, options); err != nil {
+		return err
+	}
+	if err = addCredentialSource(stack, options); err != nil {
 		return err
 	}
 	if err = addOpGetOpenIdTokenValidationMiddleware(stack); err != nil {
@@ -135,6 +149,48 @@ func (c *Client) addOperationGetOpenIdTokenMiddlewares(stack *middleware.Stack, 
 		return err
 	}
 	if err = addDisableHTTPSMiddleware(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptBeforeRetryLoop(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptAttempt(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptExecution(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptBeforeSerialization(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptAfterSerialization(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptBeforeSigning(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptAfterSigning(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptTransmit(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptBeforeDeserialization(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptAfterDeserialization(stack, options); err != nil {
+		return err
+	}
+	if err = addSpanInitializeStart(stack); err != nil {
+		return err
+	}
+	if err = addSpanInitializeEnd(stack); err != nil {
+		return err
+	}
+	if err = addSpanBuildRequestStart(stack); err != nil {
+		return err
+	}
+	if err = addSpanBuildRequestEnd(stack); err != nil {
 		return err
 	}
 	return nil

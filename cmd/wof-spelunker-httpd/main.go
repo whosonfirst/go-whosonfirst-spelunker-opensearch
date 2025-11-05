@@ -2,8 +2,7 @@ package main
 
 import (
 	"context"
-	"log/slog"
-	"os"
+	"log"
 
 	_ "github.com/whosonfirst/go-cache-ristretto"
 	"github.com/whosonfirst/go-whosonfirst-spelunker-httpd/app/server"
@@ -13,12 +12,9 @@ import (
 func main() {
 
 	ctx := context.Background()
-	logger := slog.Default()
-
-	err := server.Run(ctx, logger)
+	err := server.Run(ctx)
 
 	if err != nil {
-		slog.Error("Failed to run server", "error", err)
-		os.Exit(1)
+		log.Fatalf("Failed to run server, %v", err)
 	}
 }

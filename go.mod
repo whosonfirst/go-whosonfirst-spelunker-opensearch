@@ -1,57 +1,70 @@
 module github.com/whosonfirst/go-whosonfirst-spelunker-opensearch
 
-go 1.22.3
+go 1.25.0
 
 require (
 	github.com/aaronland/go-pagination v0.3.0
 	github.com/opensearch-project/opensearch-go/v2 v2.3.0
-	github.com/sfomuseum/go-edtf v1.1.1
-	github.com/tidwall/gjson v1.17.1
+	github.com/sfomuseum/go-edtf v1.2.1
+	github.com/tidwall/gjson v1.18.0
 	github.com/whosonfirst/go-cache v0.5.3
-	github.com/whosonfirst/go-cache-ristretto v0.0.1
-	github.com/whosonfirst/go-reader v1.0.2
-	github.com/whosonfirst/go-reader-cachereader v1.1.1
-	github.com/whosonfirst/go-reader-http v0.3.1
-	github.com/whosonfirst/go-whosonfirst-flags v0.5.1
-	github.com/whosonfirst/go-whosonfirst-opensearch v0.0.17
-	github.com/whosonfirst/go-whosonfirst-placetypes v0.7.2
-	github.com/whosonfirst/go-whosonfirst-spelunker v0.0.4
-	github.com/whosonfirst/go-whosonfirst-spelunker-httpd v0.0.12
-	github.com/whosonfirst/go-whosonfirst-spr/v2 v2.3.7
+	github.com/whosonfirst/go-cache-ristretto v0.0.2
+	github.com/whosonfirst/go-reader-cachereader/v2 v2.0.0
+	github.com/whosonfirst/go-reader/v2 v2.1.0
+	github.com/whosonfirst/go-whosonfirst-flags v0.5.2
+	github.com/whosonfirst/go-whosonfirst-opensearch v0.0.18
+	github.com/whosonfirst/go-whosonfirst-placetypes v0.9.0
+	github.com/whosonfirst/go-whosonfirst-spelunker v0.0.7
+	github.com/whosonfirst/go-whosonfirst-spelunker-httpd v0.0.18
+	github.com/whosonfirst/go-whosonfirst-spr/v2 v2.3.8
 	github.com/whosonfirst/go-whosonfirst-uri v1.3.0
 )
 
 require (
 	github.com/aaronland/go-aws-auth v1.6.1 // indirect
+	github.com/aaronland/go-aws/v3 v3.0.0 // indirect
 	github.com/aaronland/go-http-rewrite v1.1.0 // indirect
-	github.com/aaronland/go-http-sanitize v0.0.8 // indirect
-	github.com/aaronland/go-http-server v1.4.1 // indirect
+	github.com/aaronland/go-http/v3 v3.2.0 // indirect
 	github.com/aaronland/go-roster v1.0.0 // indirect
+	github.com/aaronland/gocloud v1.0.0 // indirect
 	github.com/akrylysov/algnhsa v1.1.0 // indirect
-	github.com/aws/aws-lambda-go v1.46.0 // indirect
-	github.com/aws/aws-sdk-go-v2 v1.26.0 // indirect
-	github.com/aws/aws-sdk-go-v2/config v1.27.9 // indirect
-	github.com/aws/aws-sdk-go-v2/credentials v1.17.9 // indirect
-	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.16.0 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/configsources v1.3.4 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.6.4 // indirect
-	github.com/aws/aws-sdk-go-v2/internal/ini v1.8.0 // indirect
-	github.com/aws/aws-sdk-go-v2/service/cognitoidentity v1.23.4 // indirect
-	github.com/aws/aws-sdk-go-v2/service/iam v1.31.3 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.11.1 // indirect
-	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.11.6 // indirect
-	github.com/aws/aws-sdk-go-v2/service/ssm v1.49.4 // indirect
-	github.com/aws/aws-sdk-go-v2/service/sso v1.20.3 // indirect
-	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.23.3 // indirect
-	github.com/aws/aws-sdk-go-v2/service/sts v1.28.5 // indirect
-	github.com/aws/smithy-go v1.20.1 // indirect
+	github.com/aws/aws-lambda-go v1.49.0 // indirect
+	github.com/aws/aws-sdk-go v1.55.7 // indirect
+	github.com/aws/aws-sdk-go-v2 v1.38.0 // indirect
+	github.com/aws/aws-sdk-go-v2/aws/protocol/eventstream v1.7.0 // indirect
+	github.com/aws/aws-sdk-go-v2/config v1.31.0 // indirect
+	github.com/aws/aws-sdk-go-v2/credentials v1.18.4 // indirect
+	github.com/aws/aws-sdk-go-v2/feature/ec2/imds v1.18.3 // indirect
+	github.com/aws/aws-sdk-go-v2/feature/s3/manager v1.17.84 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/configsources v1.4.3 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/endpoints/v2 v2.7.3 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/ini v1.8.3 // indirect
+	github.com/aws/aws-sdk-go-v2/internal/v4a v1.4.3 // indirect
+	github.com/aws/aws-sdk-go-v2/service/cognitoidentity v1.32.0 // indirect
+	github.com/aws/aws-sdk-go-v2/service/iam v1.46.0 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/accept-encoding v1.13.0 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/checksum v1.8.3 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/presigned-url v1.13.3 // indirect
+	github.com/aws/aws-sdk-go-v2/service/internal/s3shared v1.19.3 // indirect
+	github.com/aws/aws-sdk-go-v2/service/s3 v1.87.0 // indirect
+	github.com/aws/aws-sdk-go-v2/service/ssm v1.63.0 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sso v1.28.0 // indirect
+	github.com/aws/aws-sdk-go-v2/service/ssooidc v1.33.0 // indirect
+	github.com/aws/aws-sdk-go-v2/service/sts v1.37.0 // indirect
+	github.com/aws/smithy-go v1.22.5 // indirect
 	github.com/cenkalti/backoff/v4 v4.3.0 // indirect
-	github.com/cespare/xxhash/v2 v2.1.1 // indirect
-	github.com/dgraph-io/ristretto v0.1.1 // indirect
+	github.com/cespare/xxhash/v2 v2.3.0 // indirect
+	github.com/dgraph-io/ristretto/v2 v2.1.0 // indirect
 	github.com/dominikbraun/graph v0.23.0 // indirect
 	github.com/dustin/go-humanize v1.0.1 // indirect
+	github.com/fsnotify/fsnotify v1.9.0 // indirect
 	github.com/go-ini/ini v1.67.0 // indirect
-	github.com/golang/glog v0.0.0-20160126235308-23def4e6c14b // indirect
+	github.com/go-logr/logr v1.4.3 // indirect
+	github.com/go-logr/stdr v1.2.2 // indirect
+	github.com/golang-jwt/jwt/v5 v5.3.0 // indirect
+	github.com/google/uuid v1.6.0 // indirect
+	github.com/google/wire v0.6.0 // indirect
+	github.com/googleapis/gax-go/v2 v2.15.0 // indirect
 	github.com/hashicorp/errwrap v1.0.0 // indirect
 	github.com/hashicorp/go-multierror v1.1.1 // indirect
 	github.com/jmespath/go-jmespath v0.4.0 // indirect
@@ -60,14 +73,13 @@ require (
 	github.com/mitchellh/reflectwalk v1.0.2 // indirect
 	github.com/patrickmn/go-cache v2.1.0+incompatible // indirect
 	github.com/paulmach/go.geojson v1.4.0 // indirect
-	github.com/paulmach/orb v0.10.0 // indirect
+	github.com/paulmach/orb v0.11.1 // indirect
 	github.com/pkg/errors v0.9.1 // indirect
-	github.com/rs/cors v1.11.0 // indirect
-	github.com/sfomuseum/go-flags v0.10.0 // indirect
+	github.com/rs/cors v1.11.1 // indirect
+	github.com/sfomuseum/go-flags v0.12.1 // indirect
 	github.com/sfomuseum/go-geojsonld v1.0.0 // indirect
-	github.com/sfomuseum/go-http-auth v0.11.0 // indirect
 	github.com/sfomuseum/go-http-opensearch v0.0.2 // indirect
-	github.com/sfomuseum/go-template v1.10.0 // indirect
+	github.com/sfomuseum/go-template v1.10.1 // indirect
 	github.com/sfomuseum/iso8601duration v1.1.0 // indirect
 	github.com/skip2/go-qrcode v0.0.0-20200617195104-da1b6568686e // indirect
 	github.com/tidwall/match v1.1.1 // indirect
@@ -76,11 +88,23 @@ require (
 	github.com/whosonfirst/go-geojson-svg v0.0.5 // indirect
 	github.com/whosonfirst/go-ioutil v1.0.2 // indirect
 	github.com/whosonfirst/go-sanitize v0.1.0 // indirect
-	github.com/whosonfirst/go-whosonfirst-feature v0.0.27 // indirect
+	github.com/whosonfirst/go-whosonfirst-feature v0.0.29 // indirect
 	github.com/whosonfirst/go-whosonfirst-sources v0.2.0 // indirect
 	github.com/whosonfirst/go-whosonfirst-svg v0.1.0 // indirect
 	go.mongodb.org/mongo-driver v1.11.4 // indirect
-	golang.org/x/net v0.25.0 // indirect
-	golang.org/x/sys v0.20.0 // indirect
-	golang.org/x/text v0.15.0 // indirect
+	go.opentelemetry.io/auto/sdk v1.1.0 // indirect
+	go.opentelemetry.io/otel v1.37.0 // indirect
+	go.opentelemetry.io/otel/metric v1.37.0 // indirect
+	go.opentelemetry.io/otel/sdk v1.37.0 // indirect
+	go.opentelemetry.io/otel/sdk/metric v1.37.0 // indirect
+	go.opentelemetry.io/otel/trace v1.37.0 // indirect
+	gocloud.dev v0.43.0 // indirect
+	golang.org/x/net v0.43.0 // indirect
+	golang.org/x/sys v0.35.0 // indirect
+	golang.org/x/text v0.30.0 // indirect
+	golang.org/x/xerrors v0.0.0-20240903120638-7835f813f4da // indirect
+	google.golang.org/api v0.242.0 // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20250715232539-7130f93afb79 // indirect
+	google.golang.org/grpc v1.73.0 // indirect
+	google.golang.org/protobuf v1.36.6 // indirect
 )

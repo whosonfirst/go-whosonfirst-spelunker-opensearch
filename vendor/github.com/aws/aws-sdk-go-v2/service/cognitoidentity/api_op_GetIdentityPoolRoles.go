@@ -11,8 +11,9 @@ import (
 	smithyhttp "github.com/aws/smithy-go/transport/http"
 )
 
-// Gets the roles for an identity pool. You must use AWS Developer credentials to
-// call this API.
+// Gets the roles for an identity pool.
+//
+// You must use Amazon Web Services developer credentials to call this operation.
 func (c *Client) GetIdentityPoolRoles(ctx context.Context, params *GetIdentityPoolRolesInput, optFns ...func(*Options)) (*GetIdentityPoolRolesOutput, error) {
 	if params == nil {
 		params = &GetIdentityPoolRolesInput{}
@@ -46,9 +47,9 @@ type GetIdentityPoolRolesOutput struct {
 	IdentityPoolId *string
 
 	// How users for a specific identity provider are to mapped to roles. This is a
-	// String-to- RoleMapping object map. The string identifies the identity provider,
-	// for example, "graph.facebook.com" or
-	// "cognito-idp.us-east-1.amazonaws.com/us-east-1_abcdefghi:app_client_id".
+	// String-to-RoleMapping object map. The string identifies the identity provider, for example,
+	// graph.facebook.com or
+	// cognito-idp.us-east-1.amazonaws.com/us-east-1_abcdefghi:app_client_id .
 	RoleMappings map[string]types.RoleMapping
 
 	// The map of roles associated with this pool. Currently only authenticated and
@@ -104,6 +105,9 @@ func (c *Client) addOperationGetIdentityPoolRolesMiddlewares(stack *middleware.S
 	if err = addRecordResponseTiming(stack); err != nil {
 		return err
 	}
+	if err = addSpanRetryLoop(stack, options); err != nil {
+		return err
+	}
 	if err = addClientUserAgent(stack, options); err != nil {
 		return err
 	}
@@ -114,6 +118,15 @@ func (c *Client) addOperationGetIdentityPoolRolesMiddlewares(stack *middleware.S
 		return err
 	}
 	if err = addSetLegacyContextSigningOptionsMiddleware(stack); err != nil {
+		return err
+	}
+	if err = addTimeOffsetBuild(stack, c); err != nil {
+		return err
+	}
+	if err = addUserAgentRetryMode(stack, options); err != nil {
+		return err
+	}
+	if err = addCredentialSource(stack, options); err != nil {
 		return err
 	}
 	if err = addOpGetIdentityPoolRolesValidationMiddleware(stack); err != nil {
@@ -135,6 +148,48 @@ func (c *Client) addOperationGetIdentityPoolRolesMiddlewares(stack *middleware.S
 		return err
 	}
 	if err = addDisableHTTPSMiddleware(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptBeforeRetryLoop(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptAttempt(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptExecution(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptBeforeSerialization(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptAfterSerialization(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptBeforeSigning(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptAfterSigning(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptTransmit(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptBeforeDeserialization(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptAfterDeserialization(stack, options); err != nil {
+		return err
+	}
+	if err = addSpanInitializeStart(stack); err != nil {
+		return err
+	}
+	if err = addSpanInitializeEnd(stack); err != nil {
+		return err
+	}
+	if err = addSpanBuildRequestStart(stack); err != nil {
+		return err
+	}
+	if err = addSpanBuildRequestEnd(stack); err != nil {
 		return err
 	}
 	return nil

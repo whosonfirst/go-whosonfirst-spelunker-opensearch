@@ -15,14 +15,17 @@ import (
 // logins will create an implicit linked account. You can only specify one
 // developer provider as part of the Logins map, which is linked to the identity
 // pool. The developer provider is the "domain" by which Cognito will refer to your
-// users. You can use GetOpenIdTokenForDeveloperIdentity to create a new identity
-// and to link new logins (that is, user credentials issued by a public provider or
+// users.
+//
+// You can use GetOpenIdTokenForDeveloperIdentity to create a new identity and to
+// link new logins (that is, user credentials issued by a public provider or
 // developer provider) to an existing identity. When you want to create a new
 // identity, the IdentityId should be null. When you want to associate a new login
 // with an existing authenticated/unauthenticated identity, you can do so by
 // providing the existing IdentityId . This API will create the identity in the
-// specified IdentityPoolId . You must use AWS Developer credentials to call this
-// API.
+// specified IdentityPoolId .
+//
+// You must use Amazon Web Services developer credentials to call this operation.
 func (c *Client) GetOpenIdTokenForDeveloperIdentity(ctx context.Context, params *GetOpenIdTokenForDeveloperIdentityInput, optFns ...func(*Options)) (*GetOpenIdTokenForDeveloperIdentityOutput, error) {
 	if params == nil {
 		params = &GetOpenIdTokenForDeveloperIdentityInput{}
@@ -68,12 +71,14 @@ type GetOpenIdTokenForDeveloperIdentityInput struct {
 	// The expiration time of the token, in seconds. You can specify a custom
 	// expiration time for the token so that you can cache it. If you don't provide an
 	// expiration time, the token is valid for 15 minutes. You can exchange the token
-	// with Amazon STS for temporary AWS credentials, which are valid for a maximum of
-	// one hour. The maximum token duration you can set is 24 hours. You should take
-	// care in setting the expiration time for a token, as there are significant
-	// security implications: an attacker could use a leaked token to access your AWS
-	// resources for the token's duration. Please provide for a small grace period,
-	// usually no more than 5 minutes, to account for clock skew.
+	// with Amazon STS for temporary Amazon Web Services credentials, which are valid
+	// for a maximum of one hour. The maximum token duration you can set is 24 hours.
+	// You should take care in setting the expiration time for a token, as there are
+	// significant security implications: an attacker could use a leaked token to
+	// access your Amazon Web Services resources for the token's duration.
+	//
+	// Please provide for a small grace period, usually no more than 5 minutes, to
+	// account for clock skew.
 	TokenDuration *int64
 
 	noSmithyDocumentSerde
@@ -137,6 +142,9 @@ func (c *Client) addOperationGetOpenIdTokenForDeveloperIdentityMiddlewares(stack
 	if err = addRecordResponseTiming(stack); err != nil {
 		return err
 	}
+	if err = addSpanRetryLoop(stack, options); err != nil {
+		return err
+	}
 	if err = addClientUserAgent(stack, options); err != nil {
 		return err
 	}
@@ -147,6 +155,15 @@ func (c *Client) addOperationGetOpenIdTokenForDeveloperIdentityMiddlewares(stack
 		return err
 	}
 	if err = addSetLegacyContextSigningOptionsMiddleware(stack); err != nil {
+		return err
+	}
+	if err = addTimeOffsetBuild(stack, c); err != nil {
+		return err
+	}
+	if err = addUserAgentRetryMode(stack, options); err != nil {
+		return err
+	}
+	if err = addCredentialSource(stack, options); err != nil {
 		return err
 	}
 	if err = addOpGetOpenIdTokenForDeveloperIdentityValidationMiddleware(stack); err != nil {
@@ -168,6 +185,48 @@ func (c *Client) addOperationGetOpenIdTokenForDeveloperIdentityMiddlewares(stack
 		return err
 	}
 	if err = addDisableHTTPSMiddleware(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptBeforeRetryLoop(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptAttempt(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptExecution(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptBeforeSerialization(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptAfterSerialization(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptBeforeSigning(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptAfterSigning(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptTransmit(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptBeforeDeserialization(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptAfterDeserialization(stack, options); err != nil {
+		return err
+	}
+	if err = addSpanInitializeStart(stack); err != nil {
+		return err
+	}
+	if err = addSpanInitializeEnd(stack); err != nil {
+		return err
+	}
+	if err = addSpanBuildRequestStart(stack); err != nil {
+		return err
+	}
+	if err = addSpanBuildRequestEnd(stack); err != nil {
 		return err
 	}
 	return nil
