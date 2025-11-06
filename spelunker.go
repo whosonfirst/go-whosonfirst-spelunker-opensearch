@@ -381,7 +381,7 @@ func (s *OpenSearchSpelunker) searchWithScroll(ctx context.Context, req *opensea
 
 	// To do: Add timeout code
 
-	rsp, err := s.client.Search(ctx, req)
+	rsp, err := s.client.Scroll.Get(ctx, *req)
 
 	if err != nil {
 		return nil, fmt.Errorf("Failed to execute search, %w", err)
