@@ -22,7 +22,10 @@ func (s *OpenSearchSpelunker) GetRecentFaceted(ctx context.Context, d time.Durat
 	q := s.getRecentFacetedQuery(d, filters, facets)
 	sz := 0
 
-	req := &opensearchapi.SearchRequest{
+	req := &opensearchapi.SearchReq{
+		Indices: []string{
+			s.index,
+		},
 		Body: strings.NewReader(q),
 		Size: &sz,
 	}

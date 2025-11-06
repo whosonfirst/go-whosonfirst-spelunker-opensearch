@@ -209,7 +209,7 @@ func (s *OpenSearchSpelunker) GetFeatureForId(ctx context.Context, id int64, uri
 	return io.ReadAll(rsp)
 }
 
-func (s *OpenSearchSpelunker) facet(ctx context.Context, req *opensearchapi.SearchRequest, facets []*spelunker.Facet) ([]*spelunker.Faceting, error) {
+func (s *OpenSearchSpelunker) facet(ctx context.Context, req *opensearchapi.SearchReq, facets []*spelunker.Facet) ([]*spelunker.Faceting, error) {
 
 	body, err := s.searchWithIndex(ctx, req)
 
@@ -306,7 +306,10 @@ func (s *OpenSearchSpelunker) searchPaginated(ctx context.Context, pg_opts pagin
 		scroll_id = strings.TrimLeft(scroll_id, "after-")
 		q = fmt.Sprintf(`{"scroll_id": "%s"}`, scroll_id)
 
-		req := &opensearchapi.ScrollRequest{
+		req := &opensearchapi.ScrollReq{
+			Indices: []string{
+				s.index,
+			},
 			Body:     strings.NewReader(q),
 			ScrollID: scroll_id,
 			Scroll:   scroll_duration,
@@ -320,7 +323,10 @@ func (s *OpenSearchSpelunker) searchPaginated(ctx context.Context, pg_opts pagin
 
 		from := int(pg_opts.PerPage() * (pg_opts.Pointer().(int64) - 1))
 
-		req := &opensearchapi.SearchRequest{
+		req := &opensearchapi.SearchReq{
+			Indices: []string{
+				s.index,
+			},
 			Body: strings.NewReader(q),
 			Size: &sz,
 			From: &from,
@@ -344,7 +350,7 @@ func (s *OpenSearchSpelunker) searchPaginated(ctx context.Context, pg_opts pagin
 
 // https://pkg.go.dev/github.com/opensearch-project/opensearch-go/v2@v2.3.0/opensearchapi#SearchRequest
 
-func (s *OpenSearchSpelunker) searchWithIndex(ctx context.Context, req *opensearchapi.SearchRequest) ([]byte, error) {
+func (s *OpenSearchSpelunker) searchWithIndex(ctx context.Context, req *opensearchapi.SearchReq) ([]byte, error) {
 
 	if len(req.Index) == 0 {
 		req.Index = []string{
@@ -354,7 +360,7 @@ func (s *OpenSearchSpelunker) searchWithIndex(ctx context.Context, req *opensear
 
 	// To do: Add timeout code
 
-	rsp, err := req.Do(ctx, s.client)
+	rsp, err := s.client.Search(ctx, req)
 
 	if err != nil {
 		return nil, fmt.Errorf("Failed to execute search, %w", err)
@@ -382,11 +388,11 @@ func (s *OpenSearchSpelunker) searchWithIndex(ctx context.Context, req *opensear
 
 // https://pkg.go.dev/github.com/opensearch-project/opensearch-go/v2/opensearchapi#ScrollRequest
 
-func (s *OpenSearchSpelunker) searchWithScroll(ctx context.Context, req *opensearchapi.ScrollRequest) ([]byte, error) {
+func (s *OpenSearchSpelunker) searchWithScroll(ctx context.Context, req *opensearchapi.ScrollReq) ([]byte, error) {
 
 	// To do: Add timeout code
 
-	rsp, err := req.Do(ctx, s.client)
+	rsp, err := s.client.Search(ctx, req)
 
 	if err != nil {
 		return nil, fmt.Errorf("Failed to execute search, %w", err)
@@ -432,7 +438,10 @@ func (s *OpenSearchSpelunker) countForQuery(ctx context.Context, q string) (int6
 
 	sz := 0
 
-	req := &opensearchapi.SearchRequest{
+	req := &opensearchapi.SearchReq{
+		Indices: []string{
+			s.index,
+		},
 		Body: strings.NewReader(q),
 		Size: &sz,
 	}

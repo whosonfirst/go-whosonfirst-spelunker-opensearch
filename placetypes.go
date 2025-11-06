@@ -23,7 +23,10 @@ func (s *OpenSearchSpelunker) GetPlacetypes(ctx context.Context) (*spelunker.Fac
 	q := s.matchAllFacetedQuery(facets)
 	sz := 0
 
-	req := &opensearchapi.SearchRequest{
+	req := &opensearchapi.SearchReq{
+		Indices: []string{
+			s.index,
+		},
 		Body: strings.NewReader(q),
 		Size: &sz,
 	}
@@ -48,7 +51,10 @@ func (s *OpenSearchSpelunker) HasPlacetypeFaceted(ctx context.Context, pt *place
 	q := s.hasPlacetypeFacetedQuery(pt.Name, filters, facets)
 	sz := 0
 
-	req := &opensearchapi.SearchRequest{
+	req := &opensearchapi.SearchReq{
+		Indices: []string{
+			s.index,
+		},
 		Body: strings.NewReader(q),
 		Size: &sz,
 	}
