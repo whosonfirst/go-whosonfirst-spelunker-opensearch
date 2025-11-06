@@ -31,10 +31,8 @@ OS_PSWD=dkjfhsjdkfkjdjhksfhskd98475kjHkzjxckj
 CACHE_URI=ristretto://
 ENC_CACHE_URI=$(shell $(URLESCAPE) $(CACHE_URI))
 
-READER_URI=https://data.whosonfirs.org
+READER_URI=https://data.whosonfirst.org
 ENC_READER_URI=$(shell $(URLESCAPE) $(READER_URI))
-
-# opensearch2%3A%2F%2Flocalhost%3A9200%2Fspelunker%3Frequire-tls%3Dtrue%26insecure%3Dtrue%26debug%3Dfalse%26username%3Dadmin%26password%3D$(OS_PSWD)
 
 CLIENT_URI="https://localhost:9200/spelunker?username=admin&password=$(OS_PSWD)&insecure=true&require-tls=true"
 ENC_CLIENT_URI=$(shell $(URLESCAPE) $(CLIENT_URI))

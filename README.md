@@ -54,5 +54,4 @@ See all the URL escaped gibberish in the `-spelunker-uri` flag? It's the same is
 
 * https://github.com/whosonfirst/go-whosonfirst-spelunker
 * https://github.com/whosonfirst/go-whosonfirst-spelunker-httpd
-* https://github.com/whosonfirst/whosonfirst-opensearch
-* https://github.com/whosonfirst/go-whosonfirst-opensearch
+* https://github.com/whosonfirst/go-whosonfirst-database
