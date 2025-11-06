@@ -20,7 +20,7 @@ import (
 	"github.com/whosonfirst/go-cache"
 	"github.com/whosonfirst/go-reader-cachereader/v2"
 	"github.com/whosonfirst/go-reader/v2"
-	"github.com/whosonfirst/go-whosonfirst-opensearch/v4/client"
+	"github.com/whosonfirst/go-whosonfirst-database/opensearch/client"
 	"github.com/whosonfirst/go-whosonfirst-spelunker"
 	wof_spr "github.com/whosonfirst/go-whosonfirst-spr/v2"
 	"github.com/whosonfirst/go-whosonfirst-uri"
