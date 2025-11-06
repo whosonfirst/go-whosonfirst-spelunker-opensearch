@@ -27,7 +27,9 @@ func (s *OpenSearchSpelunker) GetAlternatePlacetypes(ctx context.Context) (*spel
 			s.index,
 		},
 		Body: strings.NewReader(q),
-		Size: &sz,
+		Params: opensearchapi.SearchParams{
+			Size: &sz,
+		},
 	}
 
 	f, err := s.facet(ctx, req, facets)
@@ -55,7 +57,9 @@ func (s *OpenSearchSpelunker) HasAlternatePlacetypeFaceted(ctx context.Context, 
 			s.index,
 		},
 		Body: strings.NewReader(q),
-		Size: &sz,
+		Params: opensearchapi.SearchParams{
+			Size: &sz,
+		},
 	}
 
 	return s.facet(ctx, req, facets)

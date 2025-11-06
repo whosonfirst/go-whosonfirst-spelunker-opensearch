@@ -27,7 +27,9 @@ func (s *OpenSearchSpelunker) GetRecentFaceted(ctx context.Context, d time.Durat
 			s.index,
 		},
 		Body: strings.NewReader(q),
-		Size: &sz,
+		Params: opensearchapi.SearchParams{
+			Size: &sz,
+		},
 	}
 
 	return s.facet(ctx, req, facets)

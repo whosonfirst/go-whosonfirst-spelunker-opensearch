@@ -27,7 +27,9 @@ func (s *OpenSearchSpelunker) SearchFaceted(ctx context.Context, search_opts *sp
 			s.index,
 		},
 		Body: strings.NewReader(q),
-		Size: &sz,
+		Params: opensearchapi.SearchParams{
+			Size: &sz,
+		},
 	}
 
 	return s.facet(ctx, req, facets)

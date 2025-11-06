@@ -27,7 +27,9 @@ func (s *OpenSearchSpelunker) GetConcordances(ctx context.Context) (*spelunker.F
 			s.index,
 		},
 		Body: strings.NewReader(q),
-		Size: &sz,
+		Params: opensearchapi.SearchParams{
+			Size: &sz,
+		},
 	}
 
 	f, err := s.facet(ctx, req, facets)
@@ -57,7 +59,9 @@ func (s *OpenSearchSpelunker) HasConcordanceFaceted(ctx context.Context, namespa
 			s.index,
 		},
 		Body: strings.NewReader(q),
-		Size: &sz,
+		Params: opensearchapi.SearchParams{
+			Size: &sz,
+		},
 	}
 
 	return s.facet(ctx, req, facets)
