@@ -10,6 +10,8 @@ Documentation is incompete at this time. For starters consult the (also incomple
 
 This is work in progress and you should expect things to change, break or simply not work yet.
 
+_As of November, 2025 this package lags behind `whosonfirst/go-whosonfirst-spelunker-httpd` in some meaningful ways pending update to the `go-opensearch` packages which is always a bit of a chore._
+
 ## Examples
 
 Note: All the examples assume a "local" setup meaning there is local instance of OpenSearch running on port 9200.
