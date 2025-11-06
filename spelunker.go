@@ -305,19 +305,12 @@ func (s *OpenSearchSpelunker) searchPaginated(ctx context.Context, pg_opts pagin
 		// See this? Neither of these things are documented anywhere.
 		// Good times...
 		scroll_id = strings.TrimLeft(scroll_id, "after-")
-		q = fmt.Sprintf(`{"scroll_id": "%s"}`, scroll_id)
 
-		// FIXME???
-		// req := &opensearchapi.ScrollReq{
-		req := &opensearchapi.SearchReq{
-			Indices: []string{
-				s.index,
-			},
-			Body: strings.NewReader(q),
-			Params: opensearchapi.SearchParams{
-				// FIXME???
-				// ScrollID: scroll_id,
-				Scroll: scroll_duration,
+		req := &opensearchapi.ScrollGetReq{
+			ScrollID: scroll_id,
+			Params: opensearchapi.ScrollGetParams{
+				ScrollID: scroll_id,
+				Scroll:   scroll_duration,
 			},
 		}
 
@@ -384,8 +377,7 @@ func (s *OpenSearchSpelunker) searchWithIndex(ctx context.Context, req *opensear
 
 // https://pkg.go.dev/github.com/opensearch-project/opensearch-go/v2/opensearchapi#ScrollRequest
 
-// func (s *OpenSearchSpelunker) searchWithScroll(ctx context.Context, req *opensearchapi.ScrollReq) ([]byte, error) {
-func (s *OpenSearchSpelunker) searchWithScroll(ctx context.Context, req *opensearchapi.SearchReq) ([]byte, error) {
+func (s *OpenSearchSpelunker) searchWithScroll(ctx context.Context, req *opensearchapi.ScrollGetReq) ([]byte, error) {
 
 	// To do: Add timeout code
 
