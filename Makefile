@@ -12,11 +12,11 @@ server-linux:
 
 # Targets for running the Spelunker locally
 
-# https://github.com/whosonfirst/go-whosonfirst-opensearch
-OS_INDEX=/usr/local/whosonfirst/go-whosonfirst-opensearch/bin/wof-opensearch-index
+# https://github.com/whosonfirst/go-whosonfirst-database
+OS_INDEX=/usr/local/whosonfirst/go-whosonfirst-database/bin/wof-opensearch-index
 
-# https://github.com/whosonfirst/whosonfirst-opensearch
-WHOSONFIRST_OPENSEARCH=/usr/local/whosonfirst/whosonfirst-opensearch
+# https://github.com/whosonfirst/whosonfirst-database
+WHOSONFIRST_OPENSEARCH=/usr/local/whosonfirst/go-whosonfirst-database/opensearch
 
 # https://github.com/aaronland/go-tools
 URLESCAPE=$(shell which urlescape)

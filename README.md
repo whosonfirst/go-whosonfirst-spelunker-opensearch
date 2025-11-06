@@ -20,7 +20,7 @@ Note: All the examples assume a "local" setup meaning there is local instance of
 
 ### Indexing
 
-Using the `wof-opensearch-index` tool from the [whosonfirst/go-whosonfirst-opensearch](https://github.com/whosonfirst/go-whosonfirst-opensearch) package:
+Using the `wof-opensearch-index` tool from the [whosonfirst/go-whosonfirst-database](https://github.com/whosonfirst/go-whosonfirst-database) package:
 
 ```
 $> bin/wof-opensearch-index \
