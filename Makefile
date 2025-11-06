@@ -21,6 +21,12 @@ WHOSONFIRST_OPENSEARCH=/usr/local/whosonfirst/go-whosonfirst-database/opensearch
 # https://github.com/aaronland/go-tools
 URLESCAPE=$(shell which urlescape)
 
+# Opensearch server
+
+# This is for debugging. Do not change this at your own risk.
+# (That means you should change this.)
+OS_PSWD=dkjfhsjdkfkjdjhksfhskd98475kjHkzjxckj
+
 # CACHE_URI=gocache://
 CACHE_URI=ristretto://
 ENC_CACHE_URI=$(shell $(URLESCAPE) $(CACHE_URI))
@@ -28,16 +34,12 @@ ENC_CACHE_URI=$(shell $(URLESCAPE) $(CACHE_URI))
 READER_URI=https://data.whosonfirs.org
 ENC_READER_URI=$(shell $(URLESCAPE) $(READER_URI))
 
-DSN="https://localhost:9200/spelunker?username=admin&password=dkjfhsjdkfkjdjhksfhskd98475kjHkzjxckj&insecure=true&require-tls=true"
-ENC_DSN=$(shell $(URLESCAPE) $(DSN))
+# opensearch2%3A%2F%2Flocalhost%3A9200%2Fspelunker%3Frequire-tls%3Dtrue%26insecure%3Dtrue%26debug%3Dfalse%26username%3Dadmin%26password%3D$(OS_PSWD)
 
-SPELUNKER_URI=opensearch://?dsn=$(ENC_DSN)&cache-uri=$(ENC_CACHE_URI)&reader-uri=$(ENC_READER_URI)
+CLIENT_URI="https://localhost:9200/spelunker?username=admin&password=$(OS_PSWD)&insecure=true&require-tls=true"
+ENC_CLIENT_URI=$(shell $(URLESCAPE) $(CLIENT_URI))
 
-# Opensearch server
-
-# This is for debugging. Do not change this at your own risk.
-# (That means you should change this.)
-OS_PSWD=dkjfhsjdkfkjdjhksfhskd98475kjHkzjxckj
+SPELUNKER_URI=opensearch://?client-uri=$(ENC_CLIENT_URI)&cache-uri=$(ENC_CACHE_URI)&reader-uri=$(ENC_READER_URI)
 
 # https://opensearch.org/docs/latest/install-and-configure/install-opensearch/docker/
 #
@@ -80,7 +82,7 @@ spelunker-local-fieldlimit:
 
 index-local:
 	$(OS_INDEX) \
-		-writer-uri 'constant://?val=opensearch2%3A%2F%2Flocalhost%3A9200%2Fspelunker%3Frequire-tls%3Dtrue%26insecure%3Dtrue%26debug%3Dfalse%26username%3Dadmin%26password%3D$(OS_PSWD)' \
+		-writer-uri 'constant://?val=$(ENC_CLIENT_URI)' \
 		$(REPO)
 
 # Spelunker server
