@@ -4,7 +4,7 @@ import (
 	"context"
 	"log"
 	"log/slog"
-	
+
 	_ "github.com/whosonfirst/go-whosonfirst-spelunker-opensearch"
 	"github.com/whosonfirst/go-whosonfirst-spelunker/app/cli"
 )

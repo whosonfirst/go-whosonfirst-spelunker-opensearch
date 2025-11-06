@@ -5,8 +5,9 @@ import (
 	"log"
 
 	_ "github.com/whosonfirst/go-cache-ristretto"
-	"github.com/whosonfirst/go-whosonfirst-spelunker-httpd/app/server"
 	_ "github.com/whosonfirst/go-whosonfirst-spelunker-opensearch"
+
+	"github.com/whosonfirst/go-whosonfirst-spelunker-httpd/app/server"
 )
 
 func main() {

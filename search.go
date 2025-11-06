@@ -6,7 +6,7 @@ import (
 	"strings"
 
 	"github.com/aaronland/go-pagination"
-	opensearchapi "github.com/opensearch-project/opensearch-go/v2/opensearchapi"
+	opensearchapi "github.com/opensearch-project/opensearch-go/v4/opensearchapi"
 	"github.com/whosonfirst/go-whosonfirst-spelunker"
 	wof_spr "github.com/whosonfirst/go-whosonfirst-spr/v2"
 )
