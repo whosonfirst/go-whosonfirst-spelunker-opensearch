@@ -11,9 +11,14 @@ import (
 	smithyhttp "github.com/aws/smithy-go/transport/http"
 )
 
-// Get information about a single parameter by specifying the parameter name. To
-// get information about more than one parameter at a time, use the GetParameters
-// operation.
+// Get information about a single parameter by specifying the parameter name.
+//
+// Parameter names can't contain spaces. The service removes any spaces specified
+// for the beginning or end of a parameter name. If the specified name for a
+// parameter contains spaces between characters, the request fails with a
+// ValidationException error.
+//
+// To get information about more than one parameter at a time, use the GetParameters operation.
 func (c *Client) GetParameter(ctx context.Context, params *GetParameterInput, optFns ...func(*Options)) (*GetParameterOutput, error) {
 	if params == nil {
 		params = &GetParameterInput{}
@@ -33,10 +38,14 @@ type GetParameterInput struct {
 
 	// The name or Amazon Resource Name (ARN) of the parameter that you want to query.
 	// For parameters shared with you from another account, you must use the full ARN.
+	//
 	// To query by parameter label, use "Name": "name:label" . To query by parameter
-	// version, use "Name": "name:version" . For more information about shared
-	// parameters, see Working with shared parameters (https://docs.aws.amazon.com/systems-manager/latest/userguide/sharing.html)
-	// in the Amazon Web Services Systems Manager User Guide.
+	// version, use "Name": "name:version" .
+	//
+	// For more information about shared parameters, see [Working with shared parameters] in the Amazon Web Services
+	// Systems Manager User Guide.
+	//
+	// [Working with shared parameters]: https://docs.aws.amazon.com/systems-manager/latest/userguide/parameter-store-shared-parameters.html
 	//
 	// This member is required.
 	Name *string
@@ -102,6 +111,9 @@ func (c *Client) addOperationGetParameterMiddlewares(stack *middleware.Stack, op
 	if err = addRecordResponseTiming(stack); err != nil {
 		return err
 	}
+	if err = addSpanRetryLoop(stack, options); err != nil {
+		return err
+	}
 	if err = addClientUserAgent(stack, options); err != nil {
 		return err
 	}
@@ -112,6 +124,15 @@ func (c *Client) addOperationGetParameterMiddlewares(stack *middleware.Stack, op
 		return err
 	}
 	if err = addSetLegacyContextSigningOptionsMiddleware(stack); err != nil {
+		return err
+	}
+	if err = addTimeOffsetBuild(stack, c); err != nil {
+		return err
+	}
+	if err = addUserAgentRetryMode(stack, options); err != nil {
+		return err
+	}
+	if err = addCredentialSource(stack, options); err != nil {
 		return err
 	}
 	if err = addOpGetParameterValidationMiddleware(stack); err != nil {
@@ -133,6 +154,48 @@ func (c *Client) addOperationGetParameterMiddlewares(stack *middleware.Stack, op
 		return err
 	}
 	if err = addDisableHTTPSMiddleware(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptBeforeRetryLoop(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptAttempt(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptExecution(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptBeforeSerialization(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptAfterSerialization(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptBeforeSigning(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptAfterSigning(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptTransmit(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptBeforeDeserialization(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptAfterDeserialization(stack, options); err != nil {
+		return err
+	}
+	if err = addSpanInitializeStart(stack); err != nil {
+		return err
+	}
+	if err = addSpanInitializeEnd(stack); err != nil {
+		return err
+	}
+	if err = addSpanBuildRequestStart(stack); err != nil {
+		return err
+	}
+	if err = addSpanBuildRequestEnd(stack); err != nil {
 		return err
 	}
 	return nil

@@ -6,12 +6,6 @@ Go package implementing the `whosonfirst/go-whosonfirst-spelunker.Spelunker` int
 
 Documentation is incompete at this time. For starters consult the (also incomplete) documentation in the [whosonfirst/go-whosonfirst-spelunker](https://github.com/whosonfirst/go-whosonfirst-spelunker) package.
 
-## Important
-
-This is work in progress and you should expect things to change, break or simply not work yet.
-
-_As of November, 2025 this package lags behind `whosonfirst/go-whosonfirst-spelunker-httpd` in some meaningful ways pending update to the `go-opensearch` packages which is always a bit of a chore._
-
 ## Examples
 
 Note: All the examples assume a "local" setup meaning there is local instance of OpenSearch running on port 9200.
@@ -22,7 +16,7 @@ Note: All the examples assume a "local" setup meaning there is local instance of
 
 ### Indexing
 
-Using the `wof-opensearch-index` tool from the [whosonfirst/go-whosonfirst-opensearch](https://github.com/whosonfirst/go-whosonfirst-opensearch) package:
+Using the `wof-opensearch-index` tool from the [whosonfirst/go-whosonfirst-database](https://github.com/whosonfirst/go-whosonfirst-database) package:
 
 ```
 $> bin/wof-opensearch-index \
@@ -46,7 +40,8 @@ The `wof-opensearch-index` application however expects a [gocloud.dev/runtimevar
 $> make server-local
 go run -mod vendor cmd/httpd/main.go \
 		-server-uri http://localhost:8080 \
-		-spelunker-uri 'opensearch://?dsn=https%3A%2F%2Flocalhost%3A9200%2Fspelunker%3Fusername%3Dadmin%26password%3Ddkjfhsjdkfkjdjhksfhskd98475kjHkzjxckj%26insecure%3Dtrue%26require-tls%3Dtrue'
+		-spelunker-uri 'opensearch://?client-uri=https%3A%2F%2Flocalhost%3A9200%2Fspelunker%3Fusername%3Dadmin%26password%3Ddkjfhsjdkfkjdjhksfhskd98475kjHkzjxckj%26insecure%3Dtrue%26require-tls%3Dtrue&cache-uri=ristretto%3A%2F%2F&reader-uri=https%3A%2F%2Fdata.whosonfirst.org'
+		
 2024/03/11 09:06:51 INFO Listening for requests address=http://localhost:8080
 ```
 
@@ -56,5 +51,4 @@ See all the URL escaped gibberish in the `-spelunker-uri` flag? It's the same is
 
 * https://github.com/whosonfirst/go-whosonfirst-spelunker
 * https://github.com/whosonfirst/go-whosonfirst-spelunker-httpd
-* https://github.com/whosonfirst/whosonfirst-opensearch
-* https://github.com/whosonfirst/go-whosonfirst-opensearch
+* https://github.com/whosonfirst/go-whosonfirst-database

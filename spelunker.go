@@ -2,11 +2,11 @@ package opensearch
 
 import (
 	"context"
+	"encoding/json"
 	"fmt"
 	"io"
 	"log/slog"
 	"math"
-	_ "net/http"
 	"net/url"
 	"strings"
 	"time"
@@ -14,14 +14,13 @@ import (
 	"github.com/aaronland/go-pagination"
 	"github.com/aaronland/go-pagination/countable"
 	"github.com/aaronland/go-pagination/cursor"
-	opensearch "github.com/opensearch-project/opensearch-go/v2"
-	opensearchapi "github.com/opensearch-project/opensearch-go/v2/opensearchapi"
+	// opensearch "github.com/opensearch-project/opensearch-go/v4"
+	opensearchapi "github.com/opensearch-project/opensearch-go/v4/opensearchapi"
 	"github.com/tidwall/gjson"
 	"github.com/whosonfirst/go-cache"
-	"github.com/whosonfirst/go-reader"
-	"github.com/whosonfirst/go-reader-cachereader"
-	_ "github.com/whosonfirst/go-reader-http"
-	"github.com/whosonfirst/go-whosonfirst-opensearch/client"
+	"github.com/whosonfirst/go-reader-cachereader/v2"
+	"github.com/whosonfirst/go-reader/v2"
+	"github.com/whosonfirst/go-whosonfirst-database/opensearch/client"
 	"github.com/whosonfirst/go-whosonfirst-spelunker"
 	wof_spr "github.com/whosonfirst/go-whosonfirst-spr/v2"
 	"github.com/whosonfirst/go-whosonfirst-uri"
@@ -32,7 +31,7 @@ const scroll_trigger int64 = 10000
 
 type OpenSearchSpelunker struct {
 	spelunker.Spelunker
-	client *opensearch.Client
+	client *opensearchapi.Client
 	index  string
 	reader reader.Reader
 	cache  cache.Cache
@@ -53,21 +52,34 @@ func NewOpenSearchSpelunker(ctx context.Context, uri string) (spelunker.Spelunke
 
 	q := u.Query()
 
-	dsn := q.Get("dsn")
+	cl_uri := q.Get("client-uri")
 
-	if dsn == "" {
-		return nil, fmt.Errorf("Missing ?dsn= parameter")
+	if cl_uri == "" {
+		return nil, fmt.Errorf("Missing ?client-uri= parameter")
 	}
 
-	cl, err := client.NewClient(ctx, dsn)
+	cl, err := client.NewClient(ctx, cl_uri)
 
 	if err != nil {
 		return nil, fmt.Errorf("Failed to create opensearch client, %w", err)
 	}
 
+	cl_u, err := url.Parse(cl_uri)
+
+	if err != nil {
+		return nil, fmt.Errorf("Failed to parse dsn (%s), %w", cl_uri, err)
+	}
+
+	index := cl_u.Path
+	index = strings.TrimLeft(index, "/")
+
+	if index == "" {
+		return nil, fmt.Errorf("Client URI is missing path component, '%s'", cl_uri)
+	}
+
 	s := &OpenSearchSpelunker{
 		client: cl,
-		index:  "spelunker",
+		index:  index,
 	}
 
 	// If we don't have an explicit reader-uri we defer creating the repo until runtime
@@ -75,7 +87,7 @@ func NewOpenSearchSpelunker(ctx context.Context, uri string) (spelunker.Spelunke
 
 	if q.Has("reader-uri") {
 
-		reader_uri := q.Get("reader_uri")
+		reader_uri := q.Get("reader-uri")
 
 		r, err := reader.NewReader(ctx, reader_uri)
 
@@ -106,7 +118,10 @@ func (s *OpenSearchSpelunker) GetRecordForId(ctx context.Context, id int64, uri_
 
 	q := fmt.Sprintf(`{"query": { "ids": { "values": [ %d ] } } }`, id)
 
-	req := &opensearchapi.SearchRequest{
+	req := &opensearchapi.SearchReq{
+		Indices: []string{
+			s.index,
+		},
 		Body: strings.NewReader(q),
 	}
 
@@ -195,7 +210,7 @@ func (s *OpenSearchSpelunker) GetFeatureForId(ctx context.Context, id int64, uri
 	return io.ReadAll(rsp)
 }
 
-func (s *OpenSearchSpelunker) facet(ctx context.Context, req *opensearchapi.SearchRequest, facets []*spelunker.Facet) ([]*spelunker.Faceting, error) {
+func (s *OpenSearchSpelunker) facet(ctx context.Context, req *opensearchapi.SearchReq, facets []*spelunker.Facet) ([]*spelunker.Faceting, error) {
 
 	body, err := s.searchWithIndex(ctx, req)
 
@@ -290,12 +305,13 @@ func (s *OpenSearchSpelunker) searchPaginated(ctx context.Context, pg_opts pagin
 		// See this? Neither of these things are documented anywhere.
 		// Good times...
 		scroll_id = strings.TrimLeft(scroll_id, "after-")
-		q = fmt.Sprintf(`{"scroll_id": "%s"}`, scroll_id)
 
-		req := &opensearchapi.ScrollRequest{
-			Body:     strings.NewReader(q),
+		req := &opensearchapi.ScrollGetReq{
 			ScrollID: scroll_id,
-			Scroll:   scroll_duration,
+			Params: opensearchapi.ScrollGetParams{
+				ScrollID: scroll_id,
+				Scroll:   scroll_duration,
+			},
 		}
 
 		body, err = s.searchWithScroll(ctx, req)
@@ -306,14 +322,19 @@ func (s *OpenSearchSpelunker) searchPaginated(ctx context.Context, pg_opts pagin
 
 		from := int(pg_opts.PerPage() * (pg_opts.Pointer().(int64) - 1))
 
-		req := &opensearchapi.SearchRequest{
+		req := &opensearchapi.SearchReq{
+			Indices: []string{
+				s.index,
+			},
 			Body: strings.NewReader(q),
-			Size: &sz,
-			From: &from,
+			Params: opensearchapi.SearchParams{
+				Size: &sz,
+				From: &from,
+			},
 		}
 
 		if use_scroll {
-			req.Scroll = scroll_duration
+			req.Params.Scroll = scroll_duration
 		}
 
 		body, err = s.searchWithIndex(ctx, req)
@@ -330,74 +351,43 @@ func (s *OpenSearchSpelunker) searchPaginated(ctx context.Context, pg_opts pagin
 
 // https://pkg.go.dev/github.com/opensearch-project/opensearch-go/v2@v2.3.0/opensearchapi#SearchRequest
 
-func (s *OpenSearchSpelunker) searchWithIndex(ctx context.Context, req *opensearchapi.SearchRequest) ([]byte, error) {
+func (s *OpenSearchSpelunker) searchWithIndex(ctx context.Context, req *opensearchapi.SearchReq) ([]byte, error) {
 
-	if len(req.Index) == 0 {
-		req.Index = []string{
+	if len(req.Indices) == 0 {
+		req.Indices = []string{
 			s.index,
 		}
 	}
 
 	// To do: Add timeout code
 
-	rsp, err := req.Do(ctx, s.client)
+	rsp, err := s.client.Search(ctx, req)
 
 	if err != nil {
 		return nil, fmt.Errorf("Failed to execute search, %w", err)
 	}
 
-	defer rsp.Body.Close()
+	// Right... so in v4 everything changed and now search returns
+	// https://pkg.go.dev/github.com/opensearch-project/opensearch-go/v4/opensearchapi#SearchResp
+	// https://pkg.go.dev/github.com/opensearch-project/opensearch-go/v4/opensearchapi#SearchHits
+	// https://pkg.go.dev/github.com/opensearch-project/opensearch-go/v4/opensearchapi#SearchHit
 
-	if rsp.StatusCode != 200 {
-
-		body, _ := io.ReadAll(rsp.Body)
-		slog.Error(string(body))
-
-		slog.Error("Query failed", "status", rsp.StatusCode)
-		return nil, fmt.Errorf("Invalid status")
-	}
-
-	body, err := io.ReadAll(rsp.Body)
-
-	if err != nil {
-		return nil, fmt.Errorf("Failed to read response, %w", err)
-	}
-
-	return body, nil
+	return json.Marshal(rsp)
 }
 
 // https://pkg.go.dev/github.com/opensearch-project/opensearch-go/v2/opensearchapi#ScrollRequest
 
-func (s *OpenSearchSpelunker) searchWithScroll(ctx context.Context, req *opensearchapi.ScrollRequest) ([]byte, error) {
+func (s *OpenSearchSpelunker) searchWithScroll(ctx context.Context, req *opensearchapi.ScrollGetReq) ([]byte, error) {
 
 	// To do: Add timeout code
 
-	rsp, err := req.Do(ctx, s.client)
+	rsp, err := s.client.Scroll.Get(ctx, *req)
 
 	if err != nil {
 		return nil, fmt.Errorf("Failed to execute search, %w", err)
 	}
 
-	defer rsp.Body.Close()
-
-	// To do: Check for expired cursor...
-
-	if rsp.StatusCode != 200 {
-
-		// body, _ := io.ReadAll(rsp.Body)
-		// slog.Error(string(body))
-
-		slog.Error("Query failed", "status", rsp.StatusCode)
-		return nil, fmt.Errorf("Invalid status")
-	}
-
-	body, err := io.ReadAll(rsp.Body)
-
-	if err != nil {
-		return nil, fmt.Errorf("Failed to read response, %w", err)
-	}
-
-	return body, nil
+	return json.Marshal(rsp)
 }
 
 func (s *OpenSearchSpelunker) propsToGeoJSON(props []byte) []byte {
@@ -418,9 +408,14 @@ func (s *OpenSearchSpelunker) countForQuery(ctx context.Context, q string) (int6
 
 	sz := 0
 
-	req := &opensearchapi.SearchRequest{
+	req := &opensearchapi.SearchReq{
+		Indices: []string{
+			s.index,
+		},
 		Body: strings.NewReader(q),
-		Size: &sz,
+		Params: opensearchapi.SearchParams{
+			Size: &sz,
+		},
 	}
 
 	body, err := s.searchWithIndex(ctx, req)

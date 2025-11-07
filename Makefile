@@ -1,36 +1,43 @@
 CWD=$(shell pwd)
 
 GOMOD=$(shell test -f "go.work" && echo "readonly" || echo "vendor")
-LDFLAG=-s -w
+LDFLAGS=-s -w
 
 cli:
-	go build -mod $(GOMOD) -ldflags="$(LDFLAGS)" -o bin/wof-spelunker-httpd cmd/httpd/main.go
+	go build -mod $(GOMOD) -ldflags="$(LDFLAGS)" -o bin/wof-spelunker cmd/wof-spelunker/main.go
+	go build -mod $(GOMOD) -ldflags="$(LDFLAGS)" -o bin/wof-spelunker-httpd cmd/wof-spelunker-httpd/main.go
+
+server-linux:
+	GOOS=linux GOARCH=amd64	go build -mod $(GOMOD) -ldflags="$(LDFLAGS)" -o work/wof-spelunker-httpd cmd/wof-spelunker-httpd/main.go
 
 # Targets for running the Spelunker locally
 
-# https://github.com/whosonfirst/go-whosonfirst-opensearch
-OS_INDEX=/usr/local/whosonfirst/go-whosonfirst-opensearch/bin/wof-opensearch-index
+# https://github.com/whosonfirst/go-whosonfirst-database
+OS_INDEX=/usr/local/whosonfirst/go-whosonfirst-database/bin/wof-opensearch-index
 
-# https://github.com/whosonfirst/whosonfirst-opensearch
-WHOSONFIRST_OPENSEARCH=/usr/local/whosonfirst/whosonfirst-opensearch
+# https://github.com/whosonfirst/whosonfirst-database
+WHOSONFIRST_OPENSEARCH=/usr/local/whosonfirst/go-whosonfirst-database/opensearch
 
 # https://github.com/aaronland/go-tools
 URLESCAPE=$(shell which urlescape)
-
-# CACHE_URI=gocache://
-CACHE_URI=ristretto://
-ENC_CACHE_URI=$(shell $(URLESCAPE) $(CACHE_URI))
-
-DSN="https://localhost:9200/spelunker?username=admin&password=dkjfhsjdkfkjdjhksfhskd98475kjHkzjxckj&insecure=true&require-tls=true&cache-uri=$(ENC_CACHE_URI)"
-ENC_DSN=$(shell $(URLESCAPE) $(DSN))
-
-SPELUNKER_URI=opensearch://?dsn=$(ENC_DSN)
 
 # Opensearch server
 
 # This is for debugging. Do not change this at your own risk.
 # (That means you should change this.)
 OS_PSWD=dkjfhsjdkfkjdjhksfhskd98475kjHkzjxckj
+
+# CACHE_URI=gocache://
+CACHE_URI=ristretto://
+ENC_CACHE_URI=$(shell $(URLESCAPE) $(CACHE_URI))
+
+READER_URI=https://data.whosonfirst.org
+ENC_READER_URI=$(shell $(URLESCAPE) $(READER_URI))
+
+CLIENT_URI="https://localhost:9200/spelunker?username=admin&password=$(OS_PSWD)&insecure=true&require-tls=true"
+ENC_CLIENT_URI=$(shell $(URLESCAPE) $(CLIENT_URI))
+
+SPELUNKER_URI=opensearch://?client-uri=$(ENC_CLIENT_URI)&cache-uri=$(ENC_CACHE_URI)&reader-uri=$(ENC_READER_URI)
 
 # https://opensearch.org/docs/latest/install-and-configure/install-opensearch/docker/
 #
@@ -73,13 +80,14 @@ spelunker-local-fieldlimit:
 
 index-local:
 	$(OS_INDEX) \
-		-writer-uri 'constant://?val=opensearch2%3A%2F%2Flocalhost%3A9200%2Fspelunker%3Frequire-tls%3Dtrue%26insecure%3Dtrue%26debug%3Dfalse%26username%3Dadmin%26password%3D$(OS_PSWD)' \
+		-writer-uri 'constant://?val=$(ENC_CLIENT_URI)' \
 		$(REPO)
 
 # Spelunker server
 
 server-local:
-	go run -mod $(GOMOD) cmd/httpd/main.go \
+	@make cli
+	./bin/wof-spelunker-httpd \
 		-server-uri http://localhost:8080 \
 		-spelunker-uri '$(SPELUNKER_URI)' \
 		-protomaps-api-key '$(APIKEY)'
@@ -93,6 +101,6 @@ lambda:
 lambda-server:
 	if test -f bootstrap; then rm -f bootstrap; fi
 	if test -f server.zip; then rm -f server.zip; fi
-	GOARCH=arm64 GOOS=linux go build -mod $(GOMOD) -ldflags="$(LDFLAGS)" -tags lambda.norpc -o bootstrap cmd/httpd/main.go
+	GOARCH=arm64 GOOS=linux go build -mod $(GOMOD) -ldflags="$(LDFLAGS)" -tags lambda.norpc -o bootstrap cmd/wof-spelunker-httpd/main.go
 	zip server.zip bootstrap
 	rm -f bootstrap

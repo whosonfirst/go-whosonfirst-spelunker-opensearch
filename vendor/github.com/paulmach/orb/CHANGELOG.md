@@ -2,6 +2,38 @@
 
 All notable changes to this project will be documented in this file.
 
+## [v0.12.0](https://github.com/paulmach/orb/compare/v0.11.1...v0.12.0) - 2025-09-17
+
+### Fixed
+
+-   Fix typos by [@NathanBaulch](https://github.com/NathanBaulch) in https://github.com/paulmach/orb/pull/157
+-   Fix panic on reverse of empty linestrings by [@jo-me](https://github.com/jo-me) in https://github.com/paulmach/orb/pull/163
+-   fix: return precisely 0.0 from mercator.ToGeo on arm64 by [@davidjb](https://github.com/davidjb) in https://github.com/paulmach/orb/pull/165
+
+### Added
+
+-   geojson: handle extra/foreign members in feature by [@paulmach](https://github.com/paulmach) in https://github.com/paulmach/orb/pull/164
+-   encoding/mvt: Support for Marshalling to Proto Objects by [@kevinkreiser](https://github.com/kevinkreiser) in https://github.com/paulmach/orb/pull/154
+
+## [v0.11.1](https://github.com/paulmach/orb/compare/v0.11.0...v0.11.1) - 2024-01-29
+
+### Fixed
+
+-   geojson: `null` json into non-pointer Feature/FeatureCollection will set them to empty by [@paulmach](https://github.com/paulmach) in https://github.com/paulmach/orb/pull/145
+
+## [v0.11.0](https://github.com/paulmach/orb/compare/v0.10.0...v0.11.0) - 2024-01-11
+
+### Fixed
+
+-   quadtree: InBoundMatching does not properly accept passed-in buffer by [@nirmal-vuppuluri](https://github.com/nirmal-vuppuluri) in https://github.com/paulmach/orb/pull/139
+-   mvt: Do not swallow error cause by [@m-pavel](https://github.com/m-pavel) in https://github.com/paulmach/orb/pull/137
+
+### Changed
+
+-   simplify: Visvalingam, by default, keeps 3 points for "areas" by [@paulmach](https://github.com/paulmach) in https://github.com/paulmach/orb/pull/140
+-   encoding/mvt: skip encoding of features will nil geometry by [@paulmach](https://github.com/paulmach) in https://github.com/paulmach/orb/pull/141
+-   encoding/wkt: improve unmarshalling performance by [@paulmach](https://github.com/paulmach) in https://github.com/paulmach/orb/pull/142
+
 ## [v0.10.0](https://github.com/paulmach/orb/compare/v0.9.2...v0.10.0) - 2023-07-16
 
 ### Added
@@ -54,7 +86,7 @@ This tag is broken, please use v0.7.1 instead.
 
 ### Breaking Changes
 
--   tilecover now returns an error (vs. panicing) on non-closed 2d geometry by [@paulmach](https://github.com/paulmach) in https://github.com/paulmach/orb/pull/87
+-   tilecover now returns an error (vs. panicking) on non-closed 2d geometry by [@paulmach](https://github.com/paulmach) in https://github.com/paulmach/orb/pull/87
 
     This changes the signature of many of the methods in the [maptile/tilecover](https://github.com/paulmach/orb/tree/master/maptile/tilecover) package.
     To emulate the old behavior replace:

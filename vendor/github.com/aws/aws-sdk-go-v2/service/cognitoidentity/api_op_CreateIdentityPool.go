@@ -12,15 +12,25 @@ import (
 )
 
 // Creates a new identity pool. The identity pool is a store of user identity
-// information that is specific to your AWS account. The keys for
+// information that is specific to your Amazon Web Services account. The keys for
 // SupportedLoginProviders are as follows:
+//
 //   - Facebook: graph.facebook.com
+//
 //   - Google: accounts.google.com
+//
+//   - Sign in With Apple: appleid.apple.com
+//
 //   - Amazon: www.amazon.com
+//
 //   - Twitter: api.twitter.com
+//
 //   - Digits: www.digits.com
 //
-// You must use AWS Developer credentials to call this API.
+// If you don't provide a value for a parameter, Amazon Cognito sets it to its
+// default value.
+//
+// You must use Amazon Web Services developer credentials to call this operation.
 func (c *Client) CreateIdentityPool(ctx context.Context, params *CreateIdentityPoolInput, optFns ...func(*Options)) (*CreateIdentityPoolOutput, error) {
 	if params == nil {
 		params = &CreateIdentityPoolInput{}
@@ -50,8 +60,9 @@ type CreateIdentityPoolInput struct {
 	IdentityPoolName *string
 
 	// Enables or disables the Basic (Classic) authentication flow. For more
-	// information, see Identity Pools (Federated Identities) Authentication Flow (https://docs.aws.amazon.com/cognito/latest/developerguide/authentication-flow.html)
-	// in the Amazon Cognito Developer Guide.
+	// information, see [Identity Pools (Federated Identities) Authentication Flow]in the Amazon Cognito Developer Guide.
+	//
+	// [Identity Pools (Federated Identities) Authentication Flow]: https://docs.aws.amazon.com/cognito/latest/developerguide/authentication-flow.html
 	AllowClassicFlow *bool
 
 	// An array of Amazon Cognito user pools and their client IDs.
@@ -60,9 +71,10 @@ type CreateIdentityPoolInput struct {
 	// The "domain" by which Cognito will refer to your users. This name acts as a
 	// placeholder that allows your backend and the Cognito service to communicate
 	// about the developer provider. For the DeveloperProviderName , you can use
-	// letters as well as period ( . ), underscore ( _ ), and dash ( - ). Once you have
-	// set a developer provider name, you cannot change it. Please take care in setting
-	// this parameter.
+	// letters as well as period ( . ), underscore ( _ ), and dash ( - ).
+	//
+	// Once you have set a developer provider name, you cannot change it. Please take
+	// care in setting this parameter.
 	DeveloperProviderName *string
 
 	// Tags to assign to the identity pool. A tag is a label that you can apply to
@@ -102,8 +114,9 @@ type CreateIdentityPoolOutput struct {
 	IdentityPoolName *string
 
 	// Enables or disables the Basic (Classic) authentication flow. For more
-	// information, see Identity Pools (Federated Identities) Authentication Flow (https://docs.aws.amazon.com/cognito/latest/developerguide/authentication-flow.html)
-	// in the Amazon Cognito Developer Guide.
+	// information, see [Identity Pools (Federated Identities) Authentication Flow]in the Amazon Cognito Developer Guide.
+	//
+	// [Identity Pools (Federated Identities) Authentication Flow]: https://docs.aws.amazon.com/cognito/latest/developerguide/authentication-flow.html
 	AllowClassicFlow *bool
 
 	// A list representing an Amazon Cognito user pool and its client ID.
@@ -176,6 +189,9 @@ func (c *Client) addOperationCreateIdentityPoolMiddlewares(stack *middleware.Sta
 	if err = addRecordResponseTiming(stack); err != nil {
 		return err
 	}
+	if err = addSpanRetryLoop(stack, options); err != nil {
+		return err
+	}
 	if err = addClientUserAgent(stack, options); err != nil {
 		return err
 	}
@@ -186,6 +202,15 @@ func (c *Client) addOperationCreateIdentityPoolMiddlewares(stack *middleware.Sta
 		return err
 	}
 	if err = addSetLegacyContextSigningOptionsMiddleware(stack); err != nil {
+		return err
+	}
+	if err = addTimeOffsetBuild(stack, c); err != nil {
+		return err
+	}
+	if err = addUserAgentRetryMode(stack, options); err != nil {
+		return err
+	}
+	if err = addCredentialSource(stack, options); err != nil {
 		return err
 	}
 	if err = addOpCreateIdentityPoolValidationMiddleware(stack); err != nil {
@@ -207,6 +232,48 @@ func (c *Client) addOperationCreateIdentityPoolMiddlewares(stack *middleware.Sta
 		return err
 	}
 	if err = addDisableHTTPSMiddleware(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptBeforeRetryLoop(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptAttempt(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptExecution(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptBeforeSerialization(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptAfterSerialization(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptBeforeSigning(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptAfterSigning(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptTransmit(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptBeforeDeserialization(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptAfterDeserialization(stack, options); err != nil {
+		return err
+	}
+	if err = addSpanInitializeStart(stack); err != nil {
+		return err
+	}
+	if err = addSpanInitializeEnd(stack); err != nil {
+		return err
+	}
+	if err = addSpanBuildRequestStart(stack); err != nil {
+		return err
+	}
+	if err = addSpanBuildRequestEnd(stack); err != nil {
 		return err
 	}
 	return nil

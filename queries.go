@@ -119,6 +119,35 @@ func (s *OpenSearchSpelunker) hasPlacetypeQueryCriteria(pt string, filters []spe
 	return s.mustQueryWithFiltersCriteria(must, filters)
 }
 
+func (s *OpenSearchSpelunker) hasAlternatePlacetypeQuery(pt string, filters []spelunker.Filter) string {
+
+	q := s.hasAlternatePlacetypeQueryCriteria(pt, filters)
+	return fmt.Sprintf(`{"query": %s }`, q)
+}
+
+func (s *OpenSearchSpelunker) hasAlternatePlacetypeFacetedQuery(pt string, filters []spelunker.Filter, facets []*spelunker.Facet) string {
+
+	q := s.hasAlternatePlacetypeQueryCriteria(pt, filters)
+	str_aggs := s.facetsToAggregations(facets)
+
+	return fmt.Sprintf(`{"query": %s, "aggs": { %s } }`, q, str_aggs)
+}
+
+func (s *OpenSearchSpelunker) hasAlternatePlacetypeQueryCriteria(pt string, filters []spelunker.Filter) string {
+
+	q := fmt.Sprintf(`{ "term": { "wof:placetype_alt":  "%s"  } }`, pt)
+
+	if len(filters) == 0 {
+		return q
+	}
+
+	must := []string{
+		q,
+	}
+
+	return s.mustQueryWithFiltersCriteria(must, filters)
+}
+
 func (s *OpenSearchSpelunker) hasConcordanceQuery(namespace string, predicate string, value any, filters []spelunker.Filter) string {
 
 	q := s.hasConcordanceQueryCriteria(namespace, predicate, value, filters)
@@ -244,8 +273,8 @@ func (s *OpenSearchSpelunker) searchQueryCriteria(search_opts *spelunker.SearchO
 	// https://github.com/whosonfirst/go-whosonfirst-spelunker-opensearch/issues/6
 	// switch to https://opensearch.org/docs/latest/query-dsl/full-text/query-string/
 	// https://opensearch.org/docs/latest/query-dsl/full-text/simple-query-string/
-	
-	q := fmt.Sprintf(`{ "simple_query_string": { "query": "%s", "fields": ["search"], "default_operator": "AND" } }`, lower_q)	
+
+	q := fmt.Sprintf(`{ "simple_query_string": { "query": "%s", "fields": ["search"], "default_operator": "AND" } }`, lower_q)
 
 	if len(filters) == 0 {
 		return q
@@ -275,6 +304,8 @@ func (s *OpenSearchSpelunker) facetsToAggregations(facets []*spelunker.Facet) st
 			facet_field = "mz:is_deprecated"
 		case "iscurrent":
 			facet_field = "mz:is_current"
+		case "placetypealt":
+			facet_field = "wof:placetype_alt"
 		default:
 			facet_field = fmt.Sprintf("wof:%s", f)
 		}
@@ -292,6 +323,8 @@ func (s *OpenSearchSpelunker) mustQueryWithFiltersCriteria(must []string, filter
 		switch f.Scheme() {
 		case "placetype":
 			must = append(must, fmt.Sprintf(`{ "term": { "wof:placetype": "%s" } }`, f.Value()))
+		case "placetypealt":
+			must = append(must, fmt.Sprintf(`{ "term": { "wof:placetype_alt": "%s" } }`, f.Value()))
 		case "country":
 			must = append(must, fmt.Sprintf(`{ "term": { "wof:country": "%s" } }`, f.Value()))
 		case "iscurrent":

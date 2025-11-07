@@ -10,9 +10,10 @@ import (
 	smithyhttp "github.com/aws/smithy-go/transport/http"
 )
 
-// Generates (or retrieves) a Cognito ID. Supplying multiple logins will create an
-// implicit linked account. This is a public API. You do not need any credentials
-// to call this API.
+// Generates (or retrieves) IdentityID. Supplying multiple logins will create an
+// implicit linked account.
+//
+// This is a public API. You do not need any credentials to call this API.
 func (c *Client) GetId(ctx context.Context, params *GetIdInput, optFns ...func(*Options)) (*GetIdOutput, error) {
 	if params == nil {
 		params = &GetIdInput{}
@@ -36,17 +37,23 @@ type GetIdInput struct {
 	// This member is required.
 	IdentityPoolId *string
 
-	// A standard AWS account ID (9+ digits).
+	// A standard Amazon Web Services account ID (9+ digits).
 	AccountId *string
 
 	// A set of optional name-value pairs that map provider names to provider tokens.
 	// The available provider names for Logins are as follows:
+	//
 	//   - Facebook: graph.facebook.com
+	//
 	//   - Amazon Cognito user pool: cognito-idp..amazonaws.com/ , for example,
 	//   cognito-idp.us-east-1.amazonaws.com/us-east-1_123456789 .
+	//
 	//   - Google: accounts.google.com
+	//
 	//   - Amazon: www.amazon.com
+	//
 	//   - Twitter: api.twitter.com
+	//
 	//   - Digits: www.digits.com
 	Logins map[string]string
 
@@ -105,6 +112,9 @@ func (c *Client) addOperationGetIdMiddlewares(stack *middleware.Stack, options O
 	if err = addRecordResponseTiming(stack); err != nil {
 		return err
 	}
+	if err = addSpanRetryLoop(stack, options); err != nil {
+		return err
+	}
 	if err = addClientUserAgent(stack, options); err != nil {
 		return err
 	}
@@ -115,6 +125,15 @@ func (c *Client) addOperationGetIdMiddlewares(stack *middleware.Stack, options O
 		return err
 	}
 	if err = addSetLegacyContextSigningOptionsMiddleware(stack); err != nil {
+		return err
+	}
+	if err = addTimeOffsetBuild(stack, c); err != nil {
+		return err
+	}
+	if err = addUserAgentRetryMode(stack, options); err != nil {
+		return err
+	}
+	if err = addCredentialSource(stack, options); err != nil {
 		return err
 	}
 	if err = addOpGetIdValidationMiddleware(stack); err != nil {
@@ -136,6 +155,48 @@ func (c *Client) addOperationGetIdMiddlewares(stack *middleware.Stack, options O
 		return err
 	}
 	if err = addDisableHTTPSMiddleware(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptBeforeRetryLoop(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptAttempt(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptExecution(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptBeforeSerialization(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptAfterSerialization(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptBeforeSigning(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptAfterSigning(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptTransmit(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptBeforeDeserialization(stack, options); err != nil {
+		return err
+	}
+	if err = addInterceptAfterDeserialization(stack, options); err != nil {
+		return err
+	}
+	if err = addSpanInitializeStart(stack); err != nil {
+		return err
+	}
+	if err = addSpanInitializeEnd(stack); err != nil {
+		return err
+	}
+	if err = addSpanBuildRequestStart(stack); err != nil {
+		return err
+	}
+	if err = addSpanBuildRequestEnd(stack); err != nil {
 		return err
 	}
 	return nil

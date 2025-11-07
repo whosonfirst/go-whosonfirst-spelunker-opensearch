@@ -5,7 +5,7 @@ import (
 	"strings"
 
 	"github.com/aaronland/go-pagination"
-	opensearchapi "github.com/opensearch-project/opensearch-go/v2/opensearchapi"
+	opensearchapi "github.com/opensearch-project/opensearch-go/v4/opensearchapi"
 	"github.com/whosonfirst/go-whosonfirst-spelunker"
 	wof_spr "github.com/whosonfirst/go-whosonfirst-spr/v2"
 )
@@ -21,9 +21,14 @@ func (s *OpenSearchSpelunker) GetDescendantsFaceted(ctx context.Context, id int6
 	q := s.descendantsFacetedQuery(id, filters, facets)
 	sz := 0
 
-	req := &opensearchapi.SearchRequest{
+	req := &opensearchapi.SearchReq{
+		Indices: []string{
+			s.index,
+		},
 		Body: strings.NewReader(q),
-		Size: &sz,
+		Params: opensearchapi.SearchParams{
+			Size: &sz,
+		},
 	}
 
 	return s.facet(ctx, req, facets)
