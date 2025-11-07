@@ -6,10 +6,6 @@ Go package implementing the `whosonfirst/go-whosonfirst-spelunker.Spelunker` int
 
 Documentation is incompete at this time. For starters consult the (also incomplete) documentation in the [whosonfirst/go-whosonfirst-spelunker](https://github.com/whosonfirst/go-whosonfirst-spelunker) package.
 
-## Important
-
-This is work in progress and you should expect things to change, break or simply not work yet.
-
 ## Examples
 
 Note: All the examples assume a "local" setup meaning there is local instance of OpenSearch running on port 9200.
@@ -44,7 +40,8 @@ The `wof-opensearch-index` application however expects a [gocloud.dev/runtimevar
 $> make server-local
 go run -mod vendor cmd/httpd/main.go \
 		-server-uri http://localhost:8080 \
-		-spelunker-uri 'opensearch://?dsn=https%3A%2F%2Flocalhost%3A9200%2Fspelunker%3Fusername%3Dadmin%26password%3Ddkjfhsjdkfkjdjhksfhskd98475kjHkzjxckj%26insecure%3Dtrue%26require-tls%3Dtrue'
+		-spelunker-uri 'opensearch://?client-uri=https%3A%2F%2Flocalhost%3A9200%2Fspelunker%3Fusername%3Dadmin%26password%3Ddkjfhsjdkfkjdjhksfhskd98475kjHkzjxckj%26insecure%3Dtrue%26require-tls%3Dtrue&cache-uri=ristretto%3A%2F%2F&reader-uri=https%3A%2F%2Fdata.whosonfirst.org'
+		
 2024/03/11 09:06:51 INFO Listening for requests address=http://localhost:8080
 ```
 
