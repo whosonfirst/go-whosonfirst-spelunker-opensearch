@@ -15,7 +15,7 @@ require (
 	github.com/whosonfirst/go-whosonfirst-flags v0.5.2
 	github.com/whosonfirst/go-whosonfirst-placetypes v0.9.0
 	github.com/whosonfirst/go-whosonfirst-spelunker v0.0.7
-	github.com/whosonfirst/go-whosonfirst-spelunker-httpd v0.0.20
+	github.com/whosonfirst/go-whosonfirst-spelunker-httpd v0.0.21
 	github.com/whosonfirst/go-whosonfirst-spr/v2 v2.3.8
 	github.com/whosonfirst/go-whosonfirst-uri v1.3.0
 )
