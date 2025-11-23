@@ -2,9 +2,10 @@
 
 Go package implementing the `whosonfirst/go-whosonfirst-spelunker.Spelunker` interface for use with OpenSearch databases.
 
-## Documentation
 
-Documentation is incompete at this time. For starters consult the (also incomplete) documentation in the [whosonfirst/go-whosonfirst-spelunker](https://github.com/whosonfirst/go-whosonfirst-spelunker) package.
+## Deprecation notice
+
+This package has been deprecated and superseded by the [whosonfirst/spelunker](https://github.com/whosonfirst/spelunker) package.
 
 ## Examples
 
